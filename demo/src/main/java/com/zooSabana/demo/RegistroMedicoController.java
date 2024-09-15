@@ -10,13 +10,14 @@ import java.util.List;
 @AllArgsConstructor
 public class RegistroMedicoController {
 
+    private RegistroMedicoJPA registroMedicoJPA;
+
     List<RegistroMedicoDTO> registros = new ArrayList<>();
 
     public RegistroMedicoController() {
         registros.add(new RegistroMedicoDTO(1L, 1L, 202201, "Enfermo", "Vegetariana", "Estable"));
         registros.add(new RegistroMedicoDTO(2L, 2L, 202202, "Sano", "Carnivora", "Estable"));
     }
-
 
     @GetMapping(path = "/registros-medicos/animal/{animalId}")
     public List<RegistroMedicoDTO> getRegistrosMedicosByAnimal(@PathVariable Long animalId) {
@@ -25,7 +26,6 @@ public class RegistroMedicoController {
                 .filter(registroMedicoDTO -> registroMedicoDTO.animalId().equals(animalId))
                 .toList();
     }
-
 
     @GetMapping(path = "/registros-medicos")
     public List<Long> getRegistrosMedicosByFecha(@RequestParam int fecha) {
@@ -56,9 +56,15 @@ public class RegistroMedicoController {
         return null;
     }
 
+    @GetMapping(path = "/registros-medicos-bd")
+    public List<RegistroMedicoORM> getRegistrosMedicosBD() {
+        return registroMedicoJPA.findAll();
+    }
+
     @PostMapping(path = "/registro-medico")
     public String createRegistroMedico(@RequestBody RegistroMedicoDTO registroMedicoDTO) {
         registros.add(registroMedicoDTO);
+        registroMedicoJPA.save(new RegistroMedicoORM(registroMedicoDTO.id(), registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento()));
         return "Registro medico guardado";
     }
 

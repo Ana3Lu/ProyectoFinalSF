@@ -10,6 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 public class EspecieController {
 
+    private EspecieJPA especieJPA;
+
     List<EspecieDTO> especies = new ArrayList<>();
 
     public EspecieController() {
@@ -35,9 +37,15 @@ public class EspecieController {
         return null;
     }
 
+    @GetMapping(path = "/especies-bd")
+    public List<EspecieORM> getEspeciesBD() {
+        return especieJPA.findAll();
+    }
+
     @PostMapping(path = "/especie")
     public String createAnimal(@RequestBody EspecieDTO animalDTO) {
         especies.add(animalDTO);
+        especieJPA.save(new EspecieORM(animalDTO.id(), animalDTO.nombre()));
         return "Especie guardada";
     }
 
