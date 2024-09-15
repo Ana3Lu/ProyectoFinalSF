@@ -1,4 +1,6 @@
 package com.zooSabana.demo;
 
-public class RegistroMedicoJPA {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RegistroMedicoJPA extends JpaRepository<RegistroMedicoORM, Long> {
 }

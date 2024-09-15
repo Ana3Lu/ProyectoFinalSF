@@ -1,4 +1,6 @@
 package com.zooSabana.demo;
 
-public class EspecieJPA {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EspecieJPA extends JpaRepository<EspecieORM, Long> {
 }
