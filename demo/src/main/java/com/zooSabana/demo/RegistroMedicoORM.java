@@ -5,17 +5,29 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "especies")
+@Table(name = "registros_medicos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EspecieORM {
+public class RegistroMedicoORM {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String nombre;
+    private Long animalId;
+
+    @Column
+    private int fecha;
+
+    @Column
+    private String estado;
+
+    @Column
+    private String dieta;
+
+    @Column
+    private String comportamiento;
 
 }
