@@ -1,82 +1,87 @@
 package com.zooSabana.demo;
 
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.YearMonth;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
 public class RegistroMedicoController {
 
-    private RegistroMedicoJPA registroMedicoJPA;
+    private RegistroMedicoService registroMedicoService;
 
-    List<RegistroMedicoDTO> registros = new ArrayList<>();
 
-    public RegistroMedicoController() {
-        registros.add(new RegistroMedicoDTO(1L, 1L, 202201, "Enfermo", "Vegetariana", "Estable"));
-        registros.add(new RegistroMedicoDTO(2L, 2L, 202202, "Sano", "Carnivora", "Estable"));
-    }
-
-    @GetMapping(path = "/registros-medicos/animal/{animalId}")
-    public List<RegistroMedicoDTO> getRegistrosMedicosByAnimal(@PathVariable Long animalId) {
-        return registros
-                .stream()
-                .filter(registroMedicoDTO -> registroMedicoDTO.animalId().equals(animalId))
-                .toList();
+    @PostMapping(path = "/registro-medico")
+    public ResponseEntity<String> createRegistroMedico(@RequestBody RegistroMedicoDTO registroMedicoDTO) {
+        try {
+            registroMedicoService.saveRegistroMedico(registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Registro médico guardado exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping(path = "/registros-medicos")
-    public List<Long> getRegistrosMedicosByFecha(@RequestParam int fecha) {
-        List<Long> animalesConControl = registros
-                .stream()
-                .filter(registro -> registro.fecha() == fecha)
-                .map(RegistroMedicoDTO::animalId)
-                .distinct()
-                .toList();
-        List<Long> animalesTodos = registros
-                .stream()
-                .map(RegistroMedicoDTO::animalId)
-                .distinct()
-                .toList();
-        return animalesTodos
-                .stream()
-                .filter(animalId -> !animalesConControl.contains(animalId))
-                .toList();
+    public ResponseEntity<List<RegistroMedicoORM>> getAllRegistrosMedicos() {
+        List<RegistroMedicoORM> registros = registroMedicoService.getAllRegistrosMedicos();
+        return ResponseEntity.status(HttpStatus.OK).body(registros);
     }
 
     @GetMapping(path = "/registros-medicos/{id}")
-    public RegistroMedicoDTO getRegistroMedicoById(@PathVariable Long id) {
-        for (RegistroMedicoDTO registroMedicoDTO : registros) {
-            if (registroMedicoDTO.id().equals(id)) {
-                return registroMedicoDTO;
-            }
+    public ResponseEntity<Object> getRegistroMedico(@RequestParam Long id) {
+        try {
+            RegistroMedicoORM registro = registroMedicoService.getRegistroMedico(id);
+            return ResponseEntity.status(HttpStatus.OK).body(registro);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return null;
     }
 
-    @GetMapping(path = "/registros-medicos-bd")
-    public List<RegistroMedicoORM> getRegistrosMedicosBD() {
-        return registroMedicoJPA.findAll();
+    @GetMapping(path = "/registros-medicos/animal/{animalId}")
+    public ResponseEntity<Object> getRegistrosMedicosByAnimal(@PathVariable Long animalId) {
+        try {
+            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistrosMedicos(animalId);
+            return ResponseEntity.status(HttpStatus.OK).body(registrosMedicos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    @PostMapping(path = "/registro-medico")
-    public String createRegistroMedico(@RequestBody RegistroMedicoDTO registroMedicoDTO) {
-        registros.add(registroMedicoDTO);
-        registroMedicoJPA.save(new RegistroMedicoORM(registroMedicoDTO.id(), registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento()));
-        return "Registro medico guardado";
+    @GetMapping(path = "/registros-medicos/animales-sin-revision/fecha/{fecha}")
+    public ResponseEntity<Object> getAnimalesSinRevision(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) YearMonth fecha) {
+        try {
+            List<Long> animales = registroMedicoService.getAnimalesSinRevision(fecha);
+            return ResponseEntity.status(HttpStatus.OK).body(animales);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/registro-medico/{id}")
+    public ResponseEntity<String> updateRegistroMedico(@PathVariable Long id, @RequestBody RegistroMedicoDTO registroMedicoDTO) {
+        try {
+            registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+            return ResponseEntity.status(HttpStatus.OK).body("Registro médico actualizado exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping(path = "/registro-medico/{id}")
     public String deleteRegistroMedico(@PathVariable Long id) {
-        for (RegistroMedicoDTO registroMedicoDTO : registros) {
-            if (registroMedicoDTO.id().equals(id)) {
-                registros.remove(registroMedicoDTO);
-                return "Registro medico eliminado";
-            }
+        try {
+            registroMedicoService.deleteRegistroMedico(id);
+            return "Registro medico eliminado exitosamente";
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
         }
-        return "Registro medico no encontrado";
     }
 
 }

@@ -1,62 +1,63 @@
 package com.zooSabana.demo;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor
 public class EspecieController {
 
-    private EspecieJPA especieJPA;
+    private EspecieService especieService;
 
-    List<EspecieDTO> especies = new ArrayList<>();
-
-    public EspecieController() {
-        especies.add(new EspecieDTO(1L, "Mamiferos"));
-        especies.add(new EspecieDTO(2L, "Aves"));
-    }
-
-    @GetMapping(path = "/especies")
-    public List<EspecieDTO> getEspecies(@RequestParam Long id) {
-        return especies
-                .stream()
-                .filter(animalDTO -> animalDTO.id().equals(id))
-                .toList();
+    @PostMapping(path = "/especie")
+    public ResponseEntity<String> createAnimal(@RequestBody EspecieDTO especieDTO) {
+        try {
+            especieService.saveEspecie(especieDTO.nombre());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Especie guardada exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping(path = "/especies/{id}")
-    public EspecieDTO getAnimalById(@PathVariable Long id) {
-        for (EspecieDTO especie : especies) {
-            if (especie.id().equals(id)) {
-                return especie;
-            }
+    public ResponseEntity<Object> getEspecieById(@PathVariable Long id) {
+        try {
+            EspecieORM especie = especieService.getEspecie(id);
+            return ResponseEntity.status(HttpStatus.OK).body(especie);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return null;
     }
 
-    @GetMapping(path = "/especies-bd")
-    public List<EspecieORM> getEspeciesBD() {
-        return especieJPA.findAll();
-    }
-
-    @PostMapping(path = "/especie")
-    public String createAnimal(@RequestBody EspecieDTO animalDTO) {
-        especies.add(animalDTO);
-        especieJPA.save(new EspecieORM(animalDTO.id(), animalDTO.nombre()));
-        return "Especie guardada";
+    @PutMapping(path = "/especies/{id}")
+    public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestParam String nombre) {
+        try {
+            especieService.updateEspecie(id, nombre);
+            return ResponseEntity.status(HttpStatus.OK).body("Especie actualizada exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping(path = "/especie/{id}")
-    public String deleteAnimal(@PathVariable Long id) {
-        for (EspecieDTO especie : especies) {
-            if (especie.id().equals(id)) {
-                especies.remove(especie);
-                return "Especie eliminada";
-            }
+    public ResponseEntity<String> deleteEspecie(@PathVariable Long id) {
+        try {
+            especieService.deleteEspecie(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Especie eliminado exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return "Especie no encontrada";
     }
 }

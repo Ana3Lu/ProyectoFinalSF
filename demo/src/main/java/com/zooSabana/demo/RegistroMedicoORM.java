@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.YearMonth;
+
 @Table(name = "registros_medicos")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,11 +18,12 @@ public class RegistroMedicoORM {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private Long animalId;
+    @ManyToOne
+    @JoinColumn(name = "animalId")
+    private AnimalORM animal;
 
     @Column
-    private int fecha;
+    private YearMonth fecha;
 
     @Column
     private String estado;

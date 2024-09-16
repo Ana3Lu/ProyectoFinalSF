@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Table(name = "animales")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +17,9 @@ public class AnimalORM {
     private Long id;
 
     @Column
-    private Long especieId;
+    @ManyToOne
+    @JoinColumn(name = "especieId")
+    private EspecieORM especie;
 
     @Column
     private String nombre;
