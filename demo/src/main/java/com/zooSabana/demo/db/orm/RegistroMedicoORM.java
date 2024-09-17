@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 
 @Table(name = "registros_medicos")
 @Entity
@@ -23,7 +23,7 @@ public class RegistroMedicoORM {
     private AnimalORM animal;
 
     @Column
-    private YearMonth fecha;
+    private LocalDate fecha;
 
     @Column
     private String estado;

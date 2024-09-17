@@ -16,7 +16,6 @@ public class AnimalORM {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
     @ManyToOne
     @JoinColumn(name = "especieId")
     private EspecieORM especie;

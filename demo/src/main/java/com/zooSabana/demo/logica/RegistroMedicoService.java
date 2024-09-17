@@ -7,7 +7,7 @@ import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -20,8 +20,8 @@ public class RegistroMedicoService {
     private AnimalJPA animalJPA;
 
 
-    public void saveRegistroMedico(Long animalId, YearMonth fecha, String estado, String dieta, String comportamiento) {
-        YearMonth fechaActual = YearMonth.now();
+    public void saveRegistroMedico(Long animalId, LocalDate fecha, String estado, String dieta, String comportamiento) {
+        LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
@@ -55,14 +55,18 @@ public class RegistroMedicoService {
                 .toList();
     }
 
-    public List<Long> getAnimalesSinRevision(YearMonth fecha) {
-        YearMonth fechaActual = YearMonth.now();
+    public List<Long> getAnimalesSinRevision(LocalDate fecha) {
+        LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
         List<Long> animalesConControl = registroMedicoJPA.findAll()
                 .stream()
-                .filter(registroMedico -> fecha.equals(registroMedico.getFecha()))
+                .filter(registroMedico -> {
+                    LocalDate registroFecha = registroMedico.getFecha();
+                    return registroFecha.getYear() == fecha.getYear() &&
+                            registroFecha.getMonth() == fecha.getMonth();
+                })
                 .map(registroMedico -> registroMedico.getAnimal().getId())
                 .distinct()
                 .toList();
@@ -85,11 +89,11 @@ public class RegistroMedicoService {
                 .orElseThrow(() -> new NoSuchElementException("Registro médico no encontrado"));
     }
 
-    public void updateRegistroMedico(Long id, Long animalId, YearMonth fecha, String estado, String dieta, String comportamiento) {
+    public void updateRegistroMedico(Long id, Long animalId, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (animalId < 0) {
             throw new IllegalArgumentException("ID de registro médico inválido");
         }
-        YearMonth fechaActual = YearMonth.now();
+        LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
