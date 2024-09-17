@@ -3,4 +3,8 @@ env: standard
 
 handlers:
   - url: /.*
-    script: this field is required, but ignored
+    script: auto
+    secure: always
+
+beta_settings:
+  cloud_sql_instances: 'fast-tensor-435818-j0:southamerica-east1:zoo-db'
