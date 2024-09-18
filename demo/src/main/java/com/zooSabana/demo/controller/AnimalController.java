@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class AnimalController {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class EspecieController {

@@ -1,5 +1,6 @@
 runtime: java17
 env: standard
+service: backend
 
 handlers:
   - url: /.*
