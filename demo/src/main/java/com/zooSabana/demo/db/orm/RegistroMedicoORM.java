@@ -19,7 +19,7 @@ public class RegistroMedicoORM {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "animalId")
+    @JoinColumn(name = "animal_id")
     private AnimalORM animal;
 
     @Column

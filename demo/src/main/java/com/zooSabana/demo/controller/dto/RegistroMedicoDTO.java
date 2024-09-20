@@ -4,5 +4,5 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
-public record RegistroMedicoDTO(Long id, Long animalId, @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM") LocalDate fecha, String estado, String dieta, String comportamiento) {
+public record RegistroMedicoDTO(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
 }

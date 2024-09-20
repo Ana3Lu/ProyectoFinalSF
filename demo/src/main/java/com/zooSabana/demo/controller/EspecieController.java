@@ -8,9 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class EspecieController {
@@ -27,10 +28,16 @@ public class EspecieController {
         }
     }
 
+    @GetMapping(path = "/especies")
+    public ResponseEntity<Object> getEspecie() {
+        List<EspecieORM> especies = especieService.getEspecie();
+        return ResponseEntity.status(HttpStatus.OK).body(especies);
+    }
+
     @GetMapping(path = "/especies/{id}")
     public ResponseEntity<Object> getEspecieById(@PathVariable Long id) {
         try {
-            EspecieORM especie = especieService.getEspecie(id);
+            EspecieORM especie = especieService.getEspecieById(id);
             return ResponseEntity.status(HttpStatus.OK).body(especie);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -39,8 +46,8 @@ public class EspecieController {
         }
     }
 
-    @PutMapping(path = "/especiesh/{id}")
-    public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestParam String nombre) {
+    @PutMapping(path = "/especies/{id}")
+    public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestBody String nombre) {
         try {
             especieService.updateEspecie(id, nombre);
             return ResponseEntity.status(HttpStatus.OK).body("Especie actualizada exitosamente");
@@ -51,11 +58,11 @@ public class EspecieController {
         }
     }
 
-    @DeleteMapping(path = "/especie/{id}")
+    @DeleteMapping(path = "/especies/{id}")
     public ResponseEntity<String> deleteEspecie(@PathVariable Long id) {
         try {
             especieService.deleteEspecie(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Especie eliminado exitosamente");
+            return ResponseEntity.status(HttpStatus.OK).body("Especie eliminada exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (NoSuchElementException e) {

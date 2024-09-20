@@ -18,14 +18,14 @@ public class AnimalService {
     private EspecieJPA especieJPA;
 
 
-    public void saveAnimal(Long especieId, String nombre, int edad) {
-        if (especieId < 0) {
+    public void saveAnimal(Long especie_id, String nombre, int edad) {
+        if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
         if (edad < 0) {
             throw new IllegalArgumentException("Edad de animal inválida");
         }
-        EspecieORM especie = especieJPA.findById(especieId)
+        EspecieORM especie = especieJPA.findById(especie_id)
                 .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
         AnimalORM nuevoAnimal = new AnimalORM();
         nuevoAnimal.setEspecie(especie);
@@ -34,11 +34,15 @@ public class AnimalService {
         animalJPA.save(nuevoAnimal);
     }
 
-    public List<AnimalORM> getAnimales(Long especieId) {
-        if (especieId < 0) {
+    public List<AnimalORM> getAnimales() {
+        return animalJPA.findAll();
+    }
+
+    public List<AnimalORM> getAnimalesByEspecie(Long especie_id) {
+        if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
-        EspecieORM especie = especieJPA.findById(especieId)
+        EspecieORM especie = especieJPA.findById(especie_id)
                 .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
         return animalJPA.findAll()
                 .stream()
@@ -54,14 +58,14 @@ public class AnimalService {
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
     }
 
-    public void updateAnimal(Long id, long especieId, String nombre, int edad) {
-        if (especieId < 0) {
+    public void updateAnimal(Long id, long especie_id, String nombre, int edad) {
+        if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
         if (edad < 0) {
             throw new IllegalArgumentException("Edad de animal inválida");
         }
-        EspecieORM especie = especieJPA.findById(especieId)
+        EspecieORM especie = especieJPA.findById(especie_id)
                 .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
         AnimalORM animal = animalJPA.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));

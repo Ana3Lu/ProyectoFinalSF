@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class AnimalController {
@@ -22,7 +22,7 @@ public class AnimalController {
     @PostMapping(path = "/animal")
     public ResponseEntity<String> createAnimal(@RequestBody AnimalDTO animalDTO) {
         try {
-            animalService.saveAnimal(animalDTO.especieId(), animalDTO.nombre(), animalDTO.edad());
+            animalService.saveAnimal(animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
             return ResponseEntity.status(HttpStatus.CREATED).body("Animal guardado exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -30,9 +30,15 @@ public class AnimalController {
     }
 
     @GetMapping(path = "/animales")
-    public ResponseEntity<Object> getAnimales(@RequestParam Long especieId) {
+    public ResponseEntity<Object> getAnimales() {
+        List<AnimalORM> animales = animalService.getAnimales();
+        return ResponseEntity.status(HttpStatus.OK).body(animales);
+    }
+
+    @GetMapping(path = "/animales-especie")
+    public ResponseEntity<Object> getAnimalesByEspecie(@RequestParam Long especie_id) {
         try {
-            List<AnimalORM> animales = animalService.getAnimales(especieId);
+            List<AnimalORM> animales = animalService.getAnimalesByEspecie(especie_id);
             return ResponseEntity.status(HttpStatus.OK).body(animales);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -51,10 +57,10 @@ public class AnimalController {
         }
     }
 
-    @PutMapping(path = "/animal/{id}")
+    @PutMapping(path = "/animales/{id}")
     public ResponseEntity<String> updateAnimal(@PathVariable Long id, @RequestBody AnimalDTO animalDTO) {
       try {
-          animalService.updateAnimal(id, animalDTO.especieId(), animalDTO.nombre(), animalDTO.edad());
+          animalService.updateAnimal(id, animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
           return ResponseEntity.status(HttpStatus.OK).body("Animal actualizado exitosamente");
       } catch (IllegalArgumentException e) {
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -63,7 +69,7 @@ public class AnimalController {
       }
     }
 
-    @DeleteMapping(path = "/animalb/{id}")
+    @DeleteMapping(path = "/animales/{id}")
     public ResponseEntity<String> deleteAnimal(@PathVariable Long id) {
         try {
             animalService.deleteAnimal(id);

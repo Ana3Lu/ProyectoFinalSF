@@ -17,7 +17,7 @@ public class AnimalORM {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "especieId")
+    @JoinColumn(name = "especie_id")
     private EspecieORM especie;
 
     @Column

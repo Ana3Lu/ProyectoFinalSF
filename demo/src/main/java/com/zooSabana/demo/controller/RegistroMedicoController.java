@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
-@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class RegistroMedicoController {
@@ -24,7 +24,7 @@ public class RegistroMedicoController {
     @PostMapping(path = "/registro-medico")
     public ResponseEntity<String> createRegistroMedico(@RequestBody RegistroMedicoDTO registroMedicoDTO) {
         try {
-            registroMedicoService.saveRegistroMedico(registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+            registroMedicoService.saveRegistroMedico(registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro médico guardado exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -32,13 +32,13 @@ public class RegistroMedicoController {
     }
 
     @GetMapping(path = "/registros-medicos")
-    public ResponseEntity<List<RegistroMedicoORM>> getAllRegistrosMedicos() {
-        List<RegistroMedicoORM> registros = registroMedicoService.getAllRegistrosMedicos();
+    public ResponseEntity<List<RegistroMedicoORM>> getRegistrosMedicos() {
+        List<RegistroMedicoORM> registros = registroMedicoService.getRegistrosMedicos();
         return ResponseEntity.status(HttpStatus.OK).body(registros);
     }
 
     @GetMapping(path = "/registros-medicos/{id}")
-    public ResponseEntity<Object> getRegistroMedico(@RequestParam Long id) {
+    public ResponseEntity<Object> getRegistroMedico(@PathVariable Long id) {
         try {
             RegistroMedicoORM registro = registroMedicoService.getRegistroMedico(id);
             return ResponseEntity.status(HttpStatus.OK).body(registro);
@@ -47,20 +47,20 @@ public class RegistroMedicoController {
         }
     }
 
-    @GetMapping(path = "/registros-medicos/animal/{animalId}")
-    public ResponseEntity<Object> getRegistrosMedicosByAnimal(@PathVariable Long animalId) {
+    @GetMapping(path = "/registros-medicos/animales/{animal_id}")
+    public ResponseEntity<Object> getRegistrosMedicosByAnimal(@PathVariable Long animal_id) {
         try {
-            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistrosMedicos(animalId);
+            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistroMedicoByAnimal(animal_id);
             return ResponseEntity.status(HttpStatus.OK).body(registrosMedicos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @GetMapping(path = "/registros-medicos/animales-sin-revision/fecha/{fecha}")
-    public ResponseEntity<Object> getAnimalesSinRevision(@PathVariable @DateTimeFormat(pattern = "yyyy-MM") LocalDate fecha) {
+    @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
+    public ResponseEntity<Object> getAnimalesSinRevision() {
         try {
-            List<Long> animales = registroMedicoService.getAnimalesSinRevision(fecha);
+            List<Long> animales = registroMedicoService.getAnimalesSinRevision();
             return ResponseEntity.status(HttpStatus.OK).body(animales);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -70,7 +70,7 @@ public class RegistroMedicoController {
     @PutMapping(path = "/registro-medico/{id}")
     public ResponseEntity<String> updateRegistroMedico(@PathVariable Long id, @RequestBody RegistroMedicoDTO registroMedicoDTO) {
         try {
-            registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animalId(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+            registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
             return ResponseEntity.status(HttpStatus.OK).body("Registro médico actualizado exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -79,7 +79,7 @@ public class RegistroMedicoController {
         }
     }
 
-    @DeleteMapping(path = "/registro-medicom/{id}")
+    @DeleteMapping(path = "/registro-medico/{id}")
     public String deleteRegistroMedico(@PathVariable Long id) {
         try {
             registroMedicoService.deleteRegistroMedico(id);

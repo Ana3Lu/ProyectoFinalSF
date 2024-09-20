@@ -5,6 +5,7 @@ import com.zooSabana.demo.db.orm.EspecieORM;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -16,14 +17,18 @@ public class EspecieService {
 
     public void saveEspecie(String nombre) {
         if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("Nombre de especie invalido");
+            throw new IllegalArgumentException("Nombre de especie inválido");
         }
         EspecieORM nuevoEspecie = new EspecieORM();
         nuevoEspecie.setNombre(nombre);
         especieJPA.save(nuevoEspecie);
     }
 
-    public EspecieORM getEspecie(long id) {
+    public List<EspecieORM> getEspecie() {
+        return especieJPA.findAll();
+    }
+
+    public EspecieORM getEspecieById(long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
