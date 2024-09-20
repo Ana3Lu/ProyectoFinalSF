@@ -1,11 +1,14 @@
 runtime: java17
-env: standard
+
+instance_class: F2
+
 service: backend
 
 handlers:
   - url: /.*
     script: auto
-    secure: always
 
-beta_settings:
-  cloud_sql_instances: 'fast-tensor-435818-j0:southamerica-east1:zoo-db'
+env_variables:
+  SPRING_DATASOURCE_URL: 'jdbc:mysql://35.199.93.168:3306/zoo_db?useSSL=false&allowPublicKeyRetrieval=true'
+  SPRING_DATASOURCE_USERNAME: 'zooUser1'
+  SPRING_DATASOURCE_PASSWORD: 'A$mqP*YJFQig=OvJ'

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
 @RestController
 @AllArgsConstructor
 public class EspecieController {
@@ -39,7 +39,7 @@ public class EspecieController {
         }
     }
 
-    @PutMapping(path = "/especies/{id}")
+    @PutMapping(path = "/especiesh/{id}")
     public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestParam String nombre) {
         try {
             especieService.updateEspecie(id, nombre);

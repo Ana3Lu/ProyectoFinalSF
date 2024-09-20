@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
 @RestController
 @AllArgsConstructor
 public class RegistroMedicoController {
@@ -79,7 +79,7 @@ public class RegistroMedicoController {
         }
     }
 
-    @DeleteMapping(path = "/registro-medico/{id}")
+    @DeleteMapping(path = "/registro-medicom/{id}")
     public String deleteRegistroMedico(@PathVariable Long id) {
         try {
             registroMedicoService.deleteRegistroMedico(id);

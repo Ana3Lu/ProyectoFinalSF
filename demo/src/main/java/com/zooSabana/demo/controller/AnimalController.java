@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://gestion-zoo.netlify.app/")
 @RestController
 @AllArgsConstructor
 public class AnimalController {
@@ -63,7 +63,7 @@ public class AnimalController {
       }
     }
 
-    @DeleteMapping(path = "/animal/{id}")
+    @DeleteMapping(path = "/animalb/{id}")
     public ResponseEntity<String> deleteAnimal(@PathVariable Long id) {
         try {
             animalService.deleteAnimal(id);
