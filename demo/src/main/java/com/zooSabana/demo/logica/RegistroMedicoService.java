@@ -51,7 +51,7 @@ public class RegistroMedicoService {
                 .orElseThrow(() -> new NoSuchElementException("Registro médico no encontrado"));
     }
 
-    public List<RegistroMedicoORM> getRegistroMedicoByAnimal(Long animal_id) {
+    public List<RegistroMedicoORM> getRegistrosMedicosByAnimal(Long animal_id) {
         if (animal_id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }

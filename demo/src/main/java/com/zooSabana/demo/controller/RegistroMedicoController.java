@@ -47,7 +47,7 @@ public class RegistroMedicoController {
     @GetMapping(path = "/registros-medicos/animales/{animal_id}")
     public ResponseEntity<Object> getRegistrosMedicosByAnimal(@PathVariable Long animal_id) {
         try {
-            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistroMedicoByAnimal(animal_id);
+            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistrosMedicosByAnimal(animal_id);
             return ResponseEntity.status(HttpStatus.OK).body(registrosMedicos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
