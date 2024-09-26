@@ -29,8 +29,8 @@ public class EspecieController {
     }
 
     @GetMapping(path = "/especies")
-    public ResponseEntity<Object> getEspecie() {
-        List<EspecieORM> especies = especieService.getEspecie();
+    public ResponseEntity<Object> getAllEspecies() {
+        List<EspecieORM> especies = especieService.getEspecies();
         return ResponseEntity.status(HttpStatus.OK).body(especies);
     }
 

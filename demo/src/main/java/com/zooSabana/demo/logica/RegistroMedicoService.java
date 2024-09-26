@@ -20,15 +20,15 @@ public class RegistroMedicoService {
     private AnimalJPA animalJPA;
 
 
-    public void saveRegistroMedico(Long animalId, LocalDate fecha, String estado, String dieta, String comportamiento) {
+    public void saveRegistroMedico(Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
-        if (animalId < 0) {
+        if (animal_id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
-        AnimalORM animal = animalJPA.findById(animalId)
+        AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
         RegistroMedicoORM nuevoRegistroMedico = new RegistroMedicoORM();
         nuevoRegistroMedico.setAnimal(animal);
@@ -43,19 +43,19 @@ public class RegistroMedicoService {
         return registroMedicoJPA.findAll();
     }
 
-    public RegistroMedicoORM getRegistroMedico(long id) {
+    public RegistroMedicoORM getRegistroMedico(Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de registro médico inválido");
         }
         return registroMedicoJPA.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Registro medico no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Registro médico no encontrado"));
     }
 
-    public List<RegistroMedicoORM> getRegistroMedicoByAnimal(Long animalId) {
-        if (animalId < 0) {
+    public List<RegistroMedicoORM> getRegistroMedicoByAnimal(Long animal_id) {
+        if (animal_id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
-        AnimalORM animal = animalJPA.findById(animalId)
+        AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
         return registroMedicoJPA.findAll()
                 .stream()
@@ -81,19 +81,22 @@ public class RegistroMedicoService {
                 .toList();
         return allAnimales
                 .stream()
-                .filter(animalId -> !animalesConControl.contains(animalId))
+                .filter(animal_id -> !animalesConControl.contains(animal_id))
                 .toList();
     }
 
-    public void updateRegistroMedico(Long id, Long animalId, LocalDate fecha, String estado, String dieta, String comportamiento) {
-        if (animalId < 0) {
+    public void updateRegistroMedico(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
+        if (id < 0) {
             throw new IllegalArgumentException("ID de registro médico inválido");
+        }
+        if (animal_id < 0) {
+            throw new IllegalArgumentException("ID de animal inválido");
         }
         LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
-        AnimalORM animal = animalJPA.findById(animalId)
+        AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
         RegistroMedicoORM registroMedico = registroMedicoJPA.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Registro médico no encontrado"));
@@ -105,12 +108,12 @@ public class RegistroMedicoService {
         registroMedicoJPA.save(registroMedico);
     }
 
-    public void deleteRegistroMedico(long id) {
+    public void deleteRegistroMedico(Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de registro médico inválido");
         }
         if (!registroMedicoJPA.existsById(id)) {
-            throw new NoSuchElementException("Animal no encontrado");
+            throw new NoSuchElementException("Registro médico no encontrado");
         }
         registroMedicoJPA.deleteById(id);
     }

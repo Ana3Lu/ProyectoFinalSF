@@ -50,7 +50,7 @@ public class AnimalService {
                 .toList();
     }
 
-    public AnimalORM getAnimal(long id) {
+    public AnimalORM getAnimal(Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
@@ -59,6 +59,9 @@ public class AnimalService {
     }
 
     public void updateAnimal(Long id, long especie_id, String nombre, int edad) {
+        if (id < 0) {
+            throw new IllegalArgumentException("ID de animal inválido");
+        }
         if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
@@ -75,7 +78,7 @@ public class AnimalService {
         animalJPA.save(animal);
     }
 
-    public void deleteAnimal(long id) {
+    public void deleteAnimal(Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }

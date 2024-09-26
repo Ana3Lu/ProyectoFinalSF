@@ -4,13 +4,10 @@ import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import com.zooSabana.demo.logica.RegistroMedicoService;
 import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @CrossOrigin(origins = "*")

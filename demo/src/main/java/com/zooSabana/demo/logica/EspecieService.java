@@ -19,18 +19,18 @@ public class EspecieService {
         if (nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("Nombre de especie inválido");
         }
-        EspecieORM nuevoEspecie = new EspecieORM();
-        nuevoEspecie.setNombre(nombre);
-        especieJPA.save(nuevoEspecie);
+        EspecieORM newEspecie = new EspecieORM();
+        newEspecie.setNombre(nombre);
+        especieJPA.save(newEspecie);
     }
 
-    public List<EspecieORM> getEspecie() {
+    public List<EspecieORM> getEspecies() {
         return especieJPA.findAll();
     }
 
-    public EspecieORM getEspecieById(long id) {
+    public EspecieORM getEspecieById(Long id) {
         if (id < 0) {
-            throw new IllegalArgumentException("ID de animal inválido");
+            throw new IllegalArgumentException("ID de especie inválido");
         }
         return especieJPA.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
@@ -46,12 +46,12 @@ public class EspecieService {
         especieJPA.save(especie);
     }
 
-    public void deleteEspecie(long id) {
+    public void deleteEspecie(Long id) {
         if (id < 0) {
-            throw new IllegalArgumentException("ID de animal inválido");
+            throw new IllegalArgumentException("ID de especie inválido");
         }
         if (!especieJPA.existsById(id)) {
-            throw new NoSuchElementException("Animal no encontrado");
+            throw new NoSuchElementException("Especie no encontrada");
         }
         especieJPA.deleteById(id);
     }

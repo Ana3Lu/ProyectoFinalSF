@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Objects;
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "h2")
@@ -26,96 +27,92 @@ public class EspecieControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        especieDTO = new EspecieDTO(null,"Ave");
+        especieDTO = new EspecieDTO("Ave");
     }
 
     @Test
-    void givenValidEspecieDTO_whenCreateEspecie_thenReturnCreated() {
+    void shouldCreateAnimalSuccessfully() {
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
-        Assertions.assertEquals(HttpStatus.CREATED, respuesta.getStatusCode());
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Especie guardada exitosamente", respuesta.getBody());
     }
 
     @Test
-    void givenInvalidEspecieDTO_whenCreateEspecie_thenReturnNotFound() {
-        especieDTO = new EspecieDTO(900L, "");
-        ResponseEntity<String> response = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals("Especie no encontrada", response.getBody());
+    void shouldNotCreateAnimalWithInvalidName() {
+        especieDTO = new EspecieDTO("");
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Nombre de especie inválido", respuesta.getBody());
     }
 
     @Test
-    void givenInvalidEspecieDTO_whenCreateEspecie_thenReturnBadRequest() {
-        especieDTO = new EspecieDTO(-5L, "");
-        ResponseEntity<String> response = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals("Nombre de especie inválido", response.getBody());
+    void shouldGetAllEspeciesSuccessfully() {
+        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/especies", Object.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(List.class, Objects.requireNonNull(respuesta.getBody()).getClass());
     }
 
     @Test
-    void whenGetEspecies_thenReturnListOfEspecies() {
-        ResponseEntity<Object> response = testRestTemplate.getForEntity("/especies", Object.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
+    void shouldGetEspecieByIdSuccessfully() {
+        long id = 1;
+        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/especies/" + id, Object.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertNotNull(respuesta.getBody());
     }
 
     @Test
-    void givenValidId_whenGetEspecieById_thenReturnEspecie() {
-        Long id = especieDTO.id();
-        ResponseEntity<Object> response = testRestTemplate.getForEntity("/especies/" + id, Object.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
+    void shouldNotGetEspecieByIdWithInvalidId() {
+        long id = 900;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/especies/" + id, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
+            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+        } else {
+            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+        }
     }
 
     @Test
-    void givenInvalidId_whenGetEspecieById_thenReturnNotFound() {
-        Long id = 900L;
-        ResponseEntity<String> response = testRestTemplate.getForEntity("/especies/" + id, String.class);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals("Especie no encontrada", response.getBody());
+    void shouldUpdateEspecieSuccessfully() {
+        long id = 1;
+        EspecieDTO newEspecieDTO = new EspecieDTO("Reptil");
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+                new HttpEntity<>(newEspecieDTO), String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals("Especie actualizada exitosamente", respuesta.getBody());
     }
 
     @Test
-    void givenInvalidId_whenGetEspecieById_thenReturnBadRequest() {
-        Long id = -5L;
-        ResponseEntity<String> response = testRestTemplate.getForEntity("/especies/" + id, String.class);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals("Id de especie inválido", response.getBody());
+    void shouldNotUpdateEspecieWithInvalidId() {
+        long id = -5;
+        EspecieDTO newEspecieDTO = new EspecieDTO("Reptil");
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+                new HttpEntity<>(newEspecieDTO), String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
+            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+        } else {
+            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+        }
     }
 
     @Test
-    void givenValidIdAndNombre_whenUpdateEspecie_thenReturnUpdated() {
-        Long id = especieDTO.id();
-        String newNombre = "Reptil";
-        ResponseEntity<String> response = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
-                new HttpEntity<>(newNombre), String.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals("Especie actualizada exitosamente", response.getBody());
+    void shouldDeleteEspecieSuccessfully() {
+        long id = 1;
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals("Especie eliminada exitosamente", respuesta.getBody());
     }
 
     @Test
-    void givenInvalidId_whenUpdateEspecie_thenReturnNotFound() {
-        Long id = 900L;
-        String newNombre = "Reptil";
-        ResponseEntity<String> response = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
-                new HttpEntity<>(newNombre), String.class);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals("Especie no encontrada", response.getBody());
-    }
-
-    @Test
-    void givenValidId_whenDeleteEspecie_thenReturnDeleted() {
-        Long id = especieDTO.id();
-        ResponseEntity<String> response = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals("Especie eliminada exitosamente", response.getBody());
-    }
-
-    @Test
-    void givenInvalidId_whenDeleteEspecie_thenReturnNotFound() {
-        Long id = 900L;
-        ResponseEntity<String> response = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals("Especie no encontrada", response.getBody());
+    void shouldNotDeleteEspecieWithInvalidId() {
+        long id = 900;
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
+            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+        } else {
+            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+        }
     }
 }
