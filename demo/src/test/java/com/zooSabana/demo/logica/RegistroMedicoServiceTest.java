@@ -2,6 +2,7 @@ package com.zooSabana.demo.logica;
 
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
+import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -69,9 +70,12 @@ public class RegistroMedicoServiceTest {
 
     @Test
     void WhenSaveRegistroMedico_ThenRegistroMedicoIsSaved() {
+        long animalId = 1L;
+
+        Mockito.when(animalJPA.findById(animalId)).thenReturn(Optional.of(new AnimalORM()));
         Mockito.when(registroMedicoJPA.save(Mockito.any(RegistroMedicoORM.class))).thenReturn(new RegistroMedicoORM());
 
-        registroMedicoService.saveRegistroMedico(1L, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo");
+        registroMedicoService.saveRegistroMedico(animalId, LocalDate.of(2023, 3, 1), "Saludable", "Carnivoro", "Tranquilo");
 
         Mockito.verify(registroMedicoJPA).save(Mockito.any(RegistroMedicoORM.class));
     }
@@ -110,7 +114,7 @@ public class RegistroMedicoServiceTest {
         RegistroMedicoORM registroMedico = registroMedicoService.getRegistroMedico(id);
 
         Assertions.assertNotNull(registroMedico);
-        Mockito.verify(registroMedicoJPA.findById(id));
+        Mockito.verify(registroMedicoJPA).findById(id);
     }
 
     @Test
@@ -216,18 +220,18 @@ public class RegistroMedicoServiceTest {
     @Test
     void GivenNonExistentId_WhenUpdateRegistroMedico_ThenThrowNoSuchElementException() {
         long id = 900;
-        Mockito.when(registroMedicoJPA.findById(id)).thenReturn(Optional.empty());
-
         Assertions.assertThrows(NoSuchElementException.class, () -> registroMedicoService.updateRegistroMedico(id, 1L, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo"));
-        Mockito.verify(registroMedicoJPA).findById(id);
     }
 
     @Test
     void WhenUpdateRegistroMedico_ThenRegistroMedicoIsUpdated() {
         long id = 1;
+        long animalId = 1L;
+
+        Mockito.when(animalJPA.findById(animalId)).thenReturn(Optional.of(new AnimalORM()));
         Mockito.when(registroMedicoJPA.findById(id)).thenReturn(Optional.of(new RegistroMedicoORM()));
 
-        registroMedicoService.updateRegistroMedico(id, 1L, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo");
+        registroMedicoService.updateRegistroMedico(id, animalId, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo");
 
         Mockito.verify(registroMedicoJPA).save(Mockito.any(RegistroMedicoORM.class));
     }

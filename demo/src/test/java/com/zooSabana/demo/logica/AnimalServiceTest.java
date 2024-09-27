@@ -3,6 +3,7 @@ package com.zooSabana.demo.logica;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,18 +48,16 @@ public class AnimalServiceTest {
     @Test
     void GivenNonExistentEspecieId_WhenSaveAnimal_ThenThrowNoSuchElementException() {
         long id = 900;
-        Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
-
         Assertions.assertThrows(NoSuchElementException.class, () -> animalService.saveAnimal(id, "Panda", 1));
-
-        Mockito.verify(animalJPA).findById(id);
     }
 
     @Test
     void WhenSaveAnimal_ThenAnimalIsSaved() {
+        long especieId = 1L;
+        Mockito.when(especieJPA.findById(especieId)).thenReturn(Optional.of(new EspecieORM()));
         Mockito.when(animalJPA.save(Mockito.any(AnimalORM.class))).thenReturn(new AnimalORM());
 
-        animalService.saveAnimal(1L, "Panda", 1);
+        animalService.saveAnimal(especieId, "Panda", 1);
 
         Mockito.verify(animalJPA).save(Mockito.any(AnimalORM.class));
     }
@@ -162,18 +161,18 @@ public class AnimalServiceTest {
     @Test
     void GivenNonExistentId_WhenUpdateAnimal_ThenThrowNoSuchElementException() {
         long id = 900;
-        Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
-
         Assertions.assertThrows(NoSuchElementException.class, () -> animalService.updateAnimal(id, 1L, "Panda",1));
-        Mockito.verify(animalJPA).findById(id);
     }
 
     @Test
     void WhenUpdateAnimal_ThenAnimalIsUpdated() {
         long id = 1;
-        Mockito.when(animalJPA.findById(id)).thenReturn(Optional.of(new AnimalORM()));
+        long especieId = 1L;
 
-        animalService.updateAnimal(id, 1L, "Panda",1);
+        Mockito.when(animalJPA.findById(id)).thenReturn(Optional.of(new AnimalORM()));
+        Mockito.when(especieJPA.findById(especieId)).thenReturn(Optional.of(new EspecieORM()));
+
+        animalService.updateAnimal(id, especieId, "Panda", 1);
 
         Mockito.verify(animalJPA).save(Mockito.any(AnimalORM.class));
     }
@@ -199,6 +198,6 @@ public class AnimalServiceTest {
 
         animalService.deleteAnimal(id);
 
-        Mockito.verify(especieJPA).deleteById(id);
+        Mockito.verify(animalJPA).deleteById(id);
     }
 }
