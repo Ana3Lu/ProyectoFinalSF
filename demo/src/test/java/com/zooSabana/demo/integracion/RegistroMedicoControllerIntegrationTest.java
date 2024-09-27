@@ -1,6 +1,5 @@
 package com.zooSabana.demo.integracion;
 
-import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

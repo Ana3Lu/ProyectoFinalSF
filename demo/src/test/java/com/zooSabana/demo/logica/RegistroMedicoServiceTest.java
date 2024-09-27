@@ -98,9 +98,7 @@ public class RegistroMedicoServiceTest {
         long id = 900;
         Mockito.when(registroMedicoJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            registroMedicoService.getRegistroMedico(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> registroMedicoService.getRegistroMedico(id));
         Mockito.verify(registroMedicoJPA).findById(id);
     }
 
@@ -211,9 +209,7 @@ public class RegistroMedicoServiceTest {
         long id = 900;
         Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            registroMedicoService.updateRegistroMedico(1L, id, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo");
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> registroMedicoService.updateRegistroMedico(1L, id, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo"));
         Mockito.verify(animalJPA).findById(id);
     }
 
@@ -222,9 +218,7 @@ public class RegistroMedicoServiceTest {
         long id = 900;
         Mockito.when(registroMedicoJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            registroMedicoService.updateRegistroMedico(id, 1L, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo");
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> registroMedicoService.updateRegistroMedico(id, 1L, LocalDate.of(2023,3,1), "Saludable", "Carnivoro", "Tranquilo"));
         Mockito.verify(registroMedicoJPA).findById(id);
     }
 
@@ -248,9 +242,7 @@ public class RegistroMedicoServiceTest {
         long id = 900;
         Mockito.when(registroMedicoJPA.existsById(id)).thenReturn(false);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            registroMedicoService.deleteRegistroMedico(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> registroMedicoService.deleteRegistroMedico(id));
         Mockito.verify(registroMedicoJPA).existsById(id);
     }
 

@@ -61,9 +61,7 @@ public class EspecieServiceTest {
         long id = 900;
         Mockito.when(especieJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            especieService.getEspecie(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.getEspecie(id));
         Mockito.verify(especieJPA).findById(id);
     }
 
@@ -88,9 +86,7 @@ public class EspecieServiceTest {
         long id = 900;
         Mockito.when(especieJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            especieService.updateEspecie(id, "Acuatico");
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.updateEspecie(id, "Acuatico"));
         Mockito.verify(especieJPA).findById(id);
     }
 
@@ -114,9 +110,7 @@ public class EspecieServiceTest {
         long id = 900;
         Mockito.when(especieJPA.existsById(id)).thenReturn(false);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            especieService.deleteEspecie(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.deleteEspecie(id));
         Mockito.verify(especieJPA).existsById(id);
     }
 

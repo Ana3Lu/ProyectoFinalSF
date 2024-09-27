@@ -114,9 +114,7 @@ public class AnimalServiceTest {
         long id = 900;
         Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            animalService.getAnimal(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> animalService.getAnimal(id));
         Mockito.verify(animalJPA).findById(id);
     }
 
@@ -157,9 +155,7 @@ public class AnimalServiceTest {
         long id = 900;
         Mockito.when(especieJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            animalService.updateAnimal(1L, id, "Panda", 1);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> animalService.updateAnimal(1L, id, "Panda", 1));
         Mockito.verify(especieJPA).findById(id);
     }
 
@@ -168,9 +164,7 @@ public class AnimalServiceTest {
         long id = 900;
         Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            animalService.updateAnimal(id, 1L, "Panda",1);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> animalService.updateAnimal(id, 1L, "Panda",1));
         Mockito.verify(animalJPA).findById(id);
     }
 
@@ -194,9 +188,7 @@ public class AnimalServiceTest {
         long id = 900;
         Mockito.when(animalJPA.existsById(id)).thenReturn(false);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            animalService.deleteAnimal(id);
-        });
+        Assertions.assertThrows(NoSuchElementException.class, () -> animalService.deleteAnimal(id));
         Mockito.verify(animalJPA).existsById(id);
     }
 
