@@ -31,14 +31,14 @@ public class EspecieControllerIntegrationTest {
     }
 
     @Test
-    void shouldCreateAnimalSuccessfully() {
+    void shouldCreateEspecieSuccessfully() {
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Especie guardada exitosamente", respuesta.getBody());
     }
 
     @Test
-    void shouldNotCreateAnimalWithInvalidName() {
+    void shouldNotCreateEspecieWithInvalidName() {
         especieDTO = new EspecieDTO("");
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());

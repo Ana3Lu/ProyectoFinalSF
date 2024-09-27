@@ -35,7 +35,7 @@ public class RegistroMedicoController {
     }
 
     @GetMapping(path = "/registros-medicos/{id}")
-    public ResponseEntity<Object> getRegistroMedico(@PathVariable Long id) {
+    public ResponseEntity<Object> getRegistroMedicoById(@PathVariable Long id) {
         try {
             RegistroMedicoORM registro = registroMedicoService.getRegistroMedico(id);
             return ResponseEntity.status(HttpStatus.OK).body(registro);
@@ -55,7 +55,7 @@ public class RegistroMedicoController {
     }
 
     @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
-    public ResponseEntity<Object> getAnimalesSinRevision() {
+    public ResponseEntity<Object> getAnimalesIdSinRevision() {
         try {
             List<Long> animales = registroMedicoService.getAnimalesSinRevision();
             return ResponseEntity.status(HttpStatus.OK).body(animales);

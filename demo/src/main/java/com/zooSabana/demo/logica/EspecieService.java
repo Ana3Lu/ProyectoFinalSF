@@ -28,7 +28,7 @@ public class EspecieService {
         return especieJPA.findAll();
     }
 
-    public EspecieORM getEspecieById(Long id) {
+    public EspecieORM getEspecie(Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }

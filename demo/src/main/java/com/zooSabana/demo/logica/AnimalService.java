@@ -22,6 +22,9 @@ public class AnimalService {
         if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("Nombre de animal inválido");
+        }
         if (edad < 0) {
             throw new IllegalArgumentException("Edad de animal inválida");
         }
@@ -42,12 +45,13 @@ public class AnimalService {
         if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
-        EspecieORM especie = especieJPA.findById(especie_id)
+        return animalJPA.findByEspecie_Id(especie_id);
+        /*EspecieORM especie = especieJPA.findById(especie_id)
                 .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
         return animalJPA.findAll()
                 .stream()
                 .filter(animal -> especie.equals(animal.getEspecie()))
-                .toList();
+                .toList();*/
     }
 
     public AnimalORM getAnimal(Long id) {
@@ -64,6 +68,9 @@ public class AnimalService {
         }
         if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
+        }
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("Nombre de animal inválido");
         }
         if (edad < 0) {
             throw new IllegalArgumentException("Edad de animal inválida");

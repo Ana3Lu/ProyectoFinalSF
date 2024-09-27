@@ -55,7 +55,7 @@ public class RegistroMedicoControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetRegistroMedicoByIdSuccessfully() {
+    void shouldGetRegistroMedicoByIdByIdSuccessfully() {
         long id = 1;
         ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/" + id, Object.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
@@ -63,7 +63,7 @@ public class RegistroMedicoControllerIntegrationTest {
     }
 
     @Test
-    void shouldNotGetRegistroMedicoByIdWithInvalidId() {
+    void shouldNotGetRegistroMedicoByIdByIdWithInvalidId() {
         long id = 900;
         ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/" + id, Object.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());

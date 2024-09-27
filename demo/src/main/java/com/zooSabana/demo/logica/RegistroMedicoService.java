@@ -21,12 +21,15 @@ public class RegistroMedicoService {
 
 
     public void saveRegistroMedico(Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
+        if (animal_id < 0) {
+            throw new IllegalArgumentException("ID de animal inválido");
+        }
         LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
         }
-        if (animal_id < 0) {
-            throw new IllegalArgumentException("ID de animal inválido");
+        if (estado == null || estado.isBlank() || dieta == null || dieta.isBlank() || comportamiento == null || comportamiento.isBlank()) {
+            throw new IllegalArgumentException("Ningún campo del registro médico del animal puede estar vacio");
         }
         AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
@@ -55,15 +58,28 @@ public class RegistroMedicoService {
         if (animal_id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
-        AnimalORM animal = animalJPA.findById(animal_id)
+        return registroMedicoJPA.findByAnimal_Id(animal_id);
+        /*AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
         return registroMedicoJPA.findAll()
                 .stream()
                 .filter(registroMedico -> animal.equals(registroMedico.getAnimal()))
-                .toList();
+                .toList();*/
     }
 
     public List<Long> getAnimalesSinRevision() {
+        LocalDate fechaActual = LocalDate.now();
+        LocalDate inicioMes = fechaActual.withDayOfMonth(1);
+
+        List<Long> animalesConControl = registroMedicoJPA.findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
+        List<Long> allAnimales = animalJPA.findAllAnimalIds();
+
+        return allAnimales.stream()
+                .filter(animal_id -> !animalesConControl.contains(animal_id))
+                .toList();
+    }
+
+    /*public List<Long> getAnimalesSinRevision() {
         LocalDate fechaActual = LocalDate.now();
         List<Long> animalesConControl = registroMedicoJPA.findAll()
                 .stream()
@@ -83,7 +99,7 @@ public class RegistroMedicoService {
                 .stream()
                 .filter(animal_id -> !animalesConControl.contains(animal_id))
                 .toList();
-    }
+    }*/
 
     public void updateRegistroMedico(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (id < 0) {
@@ -95,6 +111,9 @@ public class RegistroMedicoService {
         LocalDate fechaActual = LocalDate.now();
         if (fecha.isAfter(fechaActual)) {
             throw new IllegalArgumentException("Fecha de registro médico inválida");
+        }
+        if (estado == null || estado.isBlank() || dieta == null || dieta.isBlank() || comportamiento == null || comportamiento.isBlank()) {
+            throw new IllegalArgumentException("Ningún campo del registro médico del animal puede estar vacio");
         }
         AnimalORM animal = animalJPA.findById(animal_id)
                 .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));

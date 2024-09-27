@@ -19,7 +19,7 @@ public class EspecieController {
     private EspecieService especieService;
 
     @PostMapping(path = "/especie")
-    public ResponseEntity<String> createAnimal(@RequestBody EspecieDTO especieDTO) {
+    public ResponseEntity<String> createEspecie(@RequestBody EspecieDTO especieDTO) {
         try {
             especieService.saveEspecie(especieDTO.nombre());
             return ResponseEntity.status(HttpStatus.CREATED).body("Especie guardada exitosamente");
@@ -29,7 +29,7 @@ public class EspecieController {
     }
 
     @GetMapping(path = "/especies")
-    public ResponseEntity<Object> getAllEspecies() {
+    public ResponseEntity<Object> getEspecies() {
         List<EspecieORM> especies = especieService.getEspecies();
         return ResponseEntity.status(HttpStatus.OK).body(especies);
     }
@@ -37,7 +37,7 @@ public class EspecieController {
     @GetMapping(path = "/especies/{id}")
     public ResponseEntity<Object> getEspecieById(@PathVariable Long id) {
         try {
-            EspecieORM especie = especieService.getEspecieById(id);
+            EspecieORM especie = especieService.getEspecie(id);
             return ResponseEntity.status(HttpStatus.OK).body(especie);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
