@@ -77,13 +77,15 @@ public class RegistroMedicoController {
     }
 
     @DeleteMapping(path = "/registro-medico/{id}")
-    public String deleteRegistroMedico(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRegistroMedico(@PathVariable Long id) {
         try {
             registroMedicoService.deleteRegistroMedico(id);
-            return "Registro medico eliminado exitosamente";
+            return ResponseEntity.status(HttpStatus.OK).body("Registro médico eliminado exitosamente");
         } catch (IllegalArgumentException e) {
-            return e.getMessage();
-        }
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
     }
 
 }

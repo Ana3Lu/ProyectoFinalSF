@@ -1,6 +1,8 @@
 package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.EspecieDTO;
+import com.zooSabana.demo.db.jpa.EspecieJPA;
+import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,17 +15,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
 import java.util.Objects;
-import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "h2")
 public class EspecieControllerIntegrationTest {
 
-    private EspecieDTO especieDTO;
+    EspecieDTO especieDTO;
 
     @Autowired
     private TestRestTemplate testRestTemplate;
+
+    @Autowired
+    EspecieJPA especieJPA;
 
     @BeforeEach
     void setUp() {
@@ -49,13 +54,14 @@ public class EspecieControllerIntegrationTest {
     void shouldGetAllEspeciesSuccessfully() {
         ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/especies", Object.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
-        Assertions.assertEquals(List.class, Objects.requireNonNull(respuesta.getBody()).getClass());
+        Assertions.assertEquals(ArrayList.class, Objects.requireNonNull(respuesta.getBody()).getClass());
     }
 
     @Test
     void shouldGetEspecieByIdSuccessfully() {
-        long id = 1;
-        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/especies/" + id, Object.class);
+        EspecieORM especie = new EspecieORM();
+        especie = especieJPA.save(especie);
+        ResponseEntity<EspecieORM> respuesta = testRestTemplate.getForEntity("/especies/" + especie.getId(), EspecieORM.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertNotNull(respuesta.getBody());
     }
@@ -74,7 +80,9 @@ public class EspecieControllerIntegrationTest {
 
     @Test
     void shouldUpdateEspecieSuccessfully() {
-        long id = 1;
+        EspecieORM especie = new EspecieORM();
+        especie = especieJPA.save(especie);
+        long id = especie.getId();
         EspecieDTO newEspecieDTO = new EspecieDTO("Reptil");
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newEspecieDTO), String.class);
@@ -98,11 +106,18 @@ public class EspecieControllerIntegrationTest {
 
     @Test
     void shouldDeleteEspecieSuccessfully() {
-        long id = 1;
+        EspecieORM nuevaEspecie = new EspecieORM();
+        nuevaEspecie.setNombre("ave");
+        nuevaEspecie = especieJPA.save(nuevaEspecie);
+
+        long id = nuevaEspecie.getId();
+
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
+
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Especie eliminada exitosamente", respuesta.getBody());
     }
+
 
     @Test
     void shouldNotDeleteEspecieWithInvalidId() {
