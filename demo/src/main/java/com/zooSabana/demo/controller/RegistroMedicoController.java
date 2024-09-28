@@ -25,6 +25,8 @@ public class RegistroMedicoController {
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro médico guardado exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -41,6 +43,8 @@ public class RegistroMedicoController {
             return ResponseEntity.status(HttpStatus.OK).body(registro);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -51,17 +55,16 @@ public class RegistroMedicoController {
             return ResponseEntity.status(HttpStatus.OK).body(registrosMedicos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
     public ResponseEntity<Object> getAnimalesIdSinRevision() {
-        try {
-            List<Long> animales = registroMedicoService.getAnimalesSinRevision();
-            return ResponseEntity.status(HttpStatus.OK).body(animales);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        List<Long> animales = registroMedicoService.getAnimalesSinRevision();
+        return ResponseEntity.status(HttpStatus.OK).body(animales);
+
     }
 
     @PutMapping(path = "/registro-medico/{id}")
@@ -84,8 +87,8 @@ public class RegistroMedicoController {
         } catch (IllegalArgumentException e) {
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
 }

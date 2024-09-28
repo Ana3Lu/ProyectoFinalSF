@@ -58,7 +58,11 @@ public class RegistroMedicoService {
         if (animal_id < 0) {
             throw new IllegalArgumentException("ID de animal inválido");
         }
-        return registroMedicoJPA.findByAnimal_Id(animal_id);
+        List<RegistroMedicoORM> registrosMedicos = registroMedicoJPA.findByAnimal_Id(animal_id);
+        if (registrosMedicos.isEmpty()) {
+            throw new NoSuchElementException("Animal no encontrado");
+        }
+        return registrosMedicos;
     }
 
     public List<Long> getAnimalesSinRevision() {
