@@ -59,12 +59,6 @@ public class RegistroMedicoService {
             throw new IllegalArgumentException("ID de animal inválido");
         }
         return registroMedicoJPA.findByAnimal_Id(animal_id);
-        /*AnimalORM animal = animalJPA.findById(animal_id)
-                .orElseThrow(() -> new NoSuchElementException("Animal no encontrado"));
-        return registroMedicoJPA.findAll()
-                .stream()
-                .filter(registroMedico -> animal.equals(registroMedico.getAnimal()))
-                .toList();*/
     }
 
     public List<Long> getAnimalesSinRevision() {
@@ -78,28 +72,6 @@ public class RegistroMedicoService {
                 .filter(animal_id -> !animalesConControl.contains(animal_id))
                 .toList();
     }
-
-    /*public List<Long> getAnimalesSinRevision() {
-        LocalDate fechaActual = LocalDate.now();
-        List<Long> animalesConControl = registroMedicoJPA.findAll()
-                .stream()
-                .filter(registroMedico -> {
-                    LocalDate registroFecha = registroMedico.getFecha();
-                    return registroFecha.getYear() == fechaActual.getYear() &&
-                            registroFecha.getMonth() == fechaActual.getMonth();
-                })
-                .map(registroMedico -> registroMedico.getAnimal().getId())
-                .distinct()
-                .toList();
-        List<Long> allAnimales = animalJPA.findAll()
-                .stream()
-                .map(AnimalORM::getId)
-                .toList();
-        return allAnimales
-                .stream()
-                .filter(animal_id -> !animalesConControl.contains(animal_id))
-                .toList();
-    }*/
 
     public void updateRegistroMedico(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (id < 0) {
