@@ -45,13 +45,8 @@ public class AnimalService {
         if (especie_id < 0) {
             throw new IllegalArgumentException("ID de especie inválido");
         }
-        return animalJPA.findByEspecie_Id(especie_id);
-        /*EspecieORM especie = especieJPA.findById(especie_id)
-                .orElseThrow(() -> new NoSuchElementException("Especie no encontrada"));
-        return animalJPA.findAll()
-                .stream()
-                .filter(animal -> especie.equals(animal.getEspecie()))
-                .toList();*/
+        List<AnimalORM> animales = animalJPA.findByEspecie_Id(especie_id);
+        return animales;
     }
 
     public AnimalORM getAnimal(Long id) {
