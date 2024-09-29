@@ -71,6 +71,16 @@ pipeline {
                 }
             }
         }
+
+         stage ('Trivy verification') {
+                    steps {
+                        script {
+                            sh """
+                            docker run -u root -v $HOME/Library/Caches:/root/.cache/ -v /var/run/docker.sock:/var/run/docker.sock --name trivy_scan aquasec/trivy image --scanners vuln --severity CRITICAL --exit-code 1 ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}
+                            """
+                        }
+                    }
+         }
     }
 
     post {
@@ -78,6 +88,7 @@ pipeline {
             script {
                 // Clean up Docker images on the agent
                 sh "docker rmi ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} || true"
+                  sh 'docker rm -f trivy_scan || true'
             }
         }
     }
