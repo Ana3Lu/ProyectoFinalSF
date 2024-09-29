@@ -91,12 +91,21 @@ public class AnimalControllerIntegrationTest {
     }
 
     @Test
-    void shouldNotGetAnimalByIdWithInvalidId() {
+    void shouldNotGetAnimalByIdWithNonExistentId() {
         long id = 900;
         ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/animales/" + id, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotGetAnimalByIdWithInvalidId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/animales/" + id, String.class);
+
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de animal inválido", respuesta.getBody());
     }
 
     @Test
@@ -119,19 +128,36 @@ public class AnimalControllerIntegrationTest {
         Assertions.assertEquals("Animal actualizado exitosamente", respuesta.getBody());
     }
 
+    @Test
+    void shouldNotUpdateAnimalWithNonExistentId() {
+        EspecieORM especie = new EspecieORM();
+        especie = especieJPA.save(especie);
+
+        AnimalORM animal = new AnimalORM();
+        animal.setEspecie(especie);
+        animal = animalJPA.save(animal);
+
+        AnimalDTO animalDTO = new AnimalDTO(1L, "Perro", 5);
+
+        ResponseEntity<String> response = testRestTemplate.exchange("/animales/900", HttpMethod.PUT,
+                new HttpEntity<>(animalDTO), String.class
+        );
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals("Animal no encontrado", response.getBody());
+    }
 
     @Test
     void shouldNotUpdateAnimalWithInvalidId() {
-        long id = -5;
-        AnimalDTO newAnimalDTO = new AnimalDTO(1L, "Oso", 7);
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + id, HttpMethod.PUT,
-                new HttpEntity<>(newAnimalDTO), String.class);
-        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de animal inválido", respuesta.getBody());
-        }
+        AnimalDTO animalDTO = new AnimalDTO(1L, "Perro", 5);
+
+        ResponseEntity<String> response = testRestTemplate.exchange("/animales/-5", HttpMethod.PUT,
+                    new HttpEntity<>(animalDTO), String.class
+            );
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals("ID de animal inválido", response.getBody());
+
     }
 
     @Test
@@ -148,14 +174,18 @@ public class AnimalControllerIntegrationTest {
     }
 
     @Test
-    void shouldNotDeleteAnimalWithInvalidId() {
+    void shouldNotDeleteAnimalWithNonExistentId() {
         long id = 900;
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + id, HttpMethod.DELETE, null, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de animal inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotDeleteAnimalWithInvalidId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + id, HttpMethod.DELETE, null, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de animal inválido", respuesta.getBody());
     }
 }

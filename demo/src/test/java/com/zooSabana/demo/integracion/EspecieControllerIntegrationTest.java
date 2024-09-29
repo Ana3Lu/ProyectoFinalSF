@@ -67,15 +67,19 @@ public class EspecieControllerIntegrationTest {
     }
 
     @Test
-    void shouldNotGetEspecieByIdWithInvalidId() {
+    void shouldNotGetEspecieByIdWithNonExistentId() {
         long id = 900;
         ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/especies/" + id, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotGetEspecieByIdWithInvalidId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/especies/" + id, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
     }
 
     @Test
@@ -97,11 +101,17 @@ public class EspecieControllerIntegrationTest {
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newEspecieDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotUpdateEspecieWithNonExistentId() {
+        long id = 900;
+        EspecieDTO newEspecieDTO = new EspecieDTO("Reptil");
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+                new HttpEntity<>(newEspecieDTO), String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
     }
 
     @Test
@@ -118,16 +128,20 @@ public class EspecieControllerIntegrationTest {
         Assertions.assertEquals("Especie eliminada exitosamente", respuesta.getBody());
     }
 
-
     @Test
-    void shouldNotDeleteEspecieWithInvalidId() {
+    void shouldNotDeleteEspecieWithNonExistentId() {
         long id = 900;
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+    }
+
+
+    @Test
+    void shouldNotDeleteEspecieWithInvalidId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
     }
 }

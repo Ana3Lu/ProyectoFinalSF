@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface RegistroMedicoJPA extends JpaRepository<RegistroMedicoORM, Long> {
 
+    @Query("SELECT r FROM RegistroMedicoORM r WHERE r.animal.id = :animal_id")
     List<RegistroMedicoORM> findByAnimal_Id(Long animal_id);
 
     @Query("SELECT DISTINCT r.animal.id FROM RegistroMedicoORM r WHERE r.fecha BETWEEN :inicio AND :fin")
