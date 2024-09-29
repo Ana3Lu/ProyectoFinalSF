@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface AnimalJPA extends JpaRepository<AnimalORM, Long> {
 
-    List<AnimalORM> findByEspecie_Id(Long especie_id);
-
     @Query("SELECT a.id FROM AnimalORM a")
     List<Long> findAllAnimalIds();
+
+    List<AnimalORM> findByEspecie_Id(Long especie_id);
 }
