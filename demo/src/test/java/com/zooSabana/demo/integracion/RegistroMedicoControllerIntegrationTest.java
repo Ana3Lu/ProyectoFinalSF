@@ -2,8 +2,10 @@ package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
+import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.EspecieORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,9 @@ public class RegistroMedicoControllerIntegrationTest {
     AnimalJPA animalJPA;
 
     @Autowired
+    EspecieJPA especieJPA;
+
+    @Autowired
     private TestRestTemplate testRestTemplate;
 
     @BeforeEach
@@ -41,12 +46,23 @@ public class RegistroMedicoControllerIntegrationTest {
         registroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2024, 7, 1), "Saludable", "Carnivoro", "Tranquilo");
     }
 
-    /*@Test
+    @Test
     void shouldCreateRegistroMedicoSuccessfully() {
-        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/registro-medico", registroMedicoDTO, String.class);
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Perro");
+        especie = especieJPA.save(especie);
+
+        AnimalORM animal = new AnimalORM();
+        animal.setNombre("Rex");
+        animal.setEdad(5);
+        animal.setEspecie(especie);
+        animal = animalJPA.save(animal);
+
+        RegistroMedicoDTO registroMedico = new RegistroMedicoDTO(animal.getId(), LocalDate.of(2024, 7, 1), "Saludable", "Carnivoro", "Tranquilo");
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/registro-medico", registroMedico, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Registro médico guardado exitosamente", respuesta.getBody());
-    }*/
+    }
 
     @Test
     void shouldNotCreateRegistroMedicoWithInvalidFecha() {
@@ -57,19 +73,30 @@ public class RegistroMedicoControllerIntegrationTest {
     }
 
     @Test
+    void shouldNotCreateRegistroMedicoWithNonExistendAnimalId() {
+        RegistroMedicoDTO registroMedico = new RegistroMedicoDTO(900L, LocalDate.of(2024, 7, 1), "Saludable", "Carnivoro", "Tranquilo");
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/registro-medico", registroMedico, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
+    }
+
+    @Test
     void shouldGetAllRegistrosMedicosSuccessfully() {
         ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos", Object.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(ArrayList.class, Objects.requireNonNull(respuesta.getBody()).getClass());
     }
 
-   /* @Test
+   @Test
     void shouldGetRegistroMedicoByIdByIdSuccessfully() {
-        long id = 1;
-        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/" + id, Object.class);
+        RegistroMedicoORM registroMedico = new RegistroMedicoORM();
+        registroMedico = registroMedicoJPA.save(registroMedico);
+
+        long id = registroMedico.getId();
+        ResponseEntity<RegistroMedicoORM> respuesta = testRestTemplate.getForEntity("/registros-medicos/" + id, RegistroMedicoORM.class);
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertNotNull(respuesta.getBody());
-    }*/
+    }
 
     @Test
     void shouldNotGetRegistroMedicoByIdByIdWithInvalidId() {
@@ -79,9 +106,90 @@ public class RegistroMedicoControllerIntegrationTest {
         Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
     }
 
+    @Test
+    void shouldNotGetRegistroMedicoByIdByIdWithNonExistentId() {
+        long id = 900;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/registros-medicos/" + id, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
+    }
+
+    @Test
+    void shouldGetRegistroMedicoByAnimalIdSuccessfully() {
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Perro");
+        especie = especieJPA.save(especie);
+
+        AnimalORM animal = new AnimalORM();
+        animal.setNombre("Rex");
+        animal.setEdad(5);
+        animal.setEspecie(especie);
+        animal = animalJPA.save(animal);
+
+        RegistroMedicoORM registroMedico = new RegistroMedicoORM();
+        registroMedico.setAnimal(animal);
+        registroMedico.setFecha(LocalDate.now());
+        registroMedico = registroMedicoJPA.save(registroMedico);
+
+        long animalId = animal.getId();
+        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/" + animalId, Object.class);
+
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertNotNull(respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotGetRegistroMedicoByAnimalIdWithInvalidAnimalId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/" + id, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de animal inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotGetRegistroMedicoByAnimalIdWithNonExistentAnimalId() {
+        long id = 900;
+        ResponseEntity<String> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/" + id, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Animal no encontrado", respuesta.getBody());
+    }
+
+    @Test
+    void shouldGetAnimalesSinRevisionSuccessfully() {
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Gato");
+        especie = especieJPA.save(especie);
+
+        AnimalORM animal1 = new AnimalORM();
+        animal1.setNombre("Miau");
+        animal1.setEdad(2);
+        animal1.setEspecie(especie);
+        animal1 = animalJPA.save(animal1);
+
+        AnimalORM animal2 = new AnimalORM();
+        animal2.setNombre("Rex");
+        animal2.setEdad(5);
+        animal2.setEspecie(especie);
+        animal2 = animalJPA.save(animal2);
+
+        RegistroMedicoORM registro = new RegistroMedicoORM();
+        registro.setAnimal(animal1);
+        registro.setFecha(LocalDate.now());
+        registroMedicoJPA.save(registro);
+
+        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/revision-pendiente-mes", Object.class);
+
+        Assertions.assertEquals(HttpStatus.OK, respuesta.getStatusCode());
+        Assertions.assertNotNull(respuesta.getBody());
+    }
+
     /*@Test
     void shouldUpdateRegistroMedicoSuccessfully() {
+        EspecieORM especie = new EspecieORM();
+        especie = especieJPA.save(especie);
+
         AnimalORM animal = new AnimalORM();
+        animal.setEspecie(especie);
         animal = animalJPA.save(animal);
 
         RegistroMedicoORM registroMedico = new RegistroMedicoORM();
@@ -106,32 +214,45 @@ public class RegistroMedicoControllerIntegrationTest {
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
     }
 
-    /*@Test
+    @Test
+    void shouldNotUpdateRegistroMedicoWithNonExistentId() {
+        long id = 900;
+        RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+                new HttpEntity<>(newRegistroMedicoDTO), String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+    }
+
+    @Test
     void shouldDeleteRegistroMedicoSuccessfully() {
         long id = 1;
+        RegistroMedicoORM nuevoRegistroMedico = new RegistroMedicoORM();
+        nuevoRegistroMedico.setId(id);
+        registroMedicoJPA.save(nuevoRegistroMedico);
+
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
+
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Registro médico eliminado exitosamente", respuesta.getBody());
-    }*/
+    }
 
     @Test
     void shouldNotDeleteRegistroMedicoWithInvalidId() {
+        long id = -5;
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotDeleteRegistroMedicoWithNonExistentId() {
         long id = 900;
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
-        System.out.println(respuesta.getBody());
-        System.out.println(respuesta.getStatusCode());
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        if (respuesta.getStatusCode() == HttpStatus.NOT_FOUND) {
-            Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
-        } else {
-            Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
-        }
+        Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
     }
 }
