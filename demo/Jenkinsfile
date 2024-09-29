@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK 17'
+    }
+
+    environment {
+        JAVA_HOME = '/var/lib/jenkins/tools/jdk-17'
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        DOCKERHUB_REPO = 'julizzy/zoo'
+        DOCKERHUB_CREDENTIALS_ID = 'dcde267c-65cd-49a2-b04a-5b46e0ba17c9'
+
+    }
+
+    stages {
+        stage("Git") {
+            steps {
+                git branch: 'develop', url: 'https://github.com/Ana3Lu/ProyectoFinalSF.git'
+            }
+        }
+
+
+
+        stage('Check Java Version') {
+            steps {
+                sh 'java -version'  // Verifica la versión de Java
+                sh 'echo $JAVA_HOME'  // Verifica la configuración de JAVA_HOME
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('./demo') {
+                    script {
+
+                        sh "/var/lib/jenkins/tools/jdk-17/bin/java -version"
+                    }
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean build'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def image = docker.build("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        echo 'Logged in to DockerHub'
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Push the Docker image with the build number as the tag
+                    def image = docker.image("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        image.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Clean up Docker images on the agent
+                sh "docker rmi ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} || true"
+            }
+        }
+    }
+}
