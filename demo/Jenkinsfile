@@ -16,7 +16,9 @@ pipeline {
     stages {
 
         stage('SCM') {
-            checkout scm
+            steps{
+                checkout scm
+            }
         }
 
         stage('Check Java Version') {
@@ -40,9 +42,11 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-             withSonarQubeEnv() {
-                sh "./gradlew sonar"
-             }
+            steps{
+                 withSonarQubeEnv("Sonar") {
+                  sh "./gradlew sonar"
+                 }
+            }
         }
 
         stage('Build Docker Image') {
