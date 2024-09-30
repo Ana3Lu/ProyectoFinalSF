@@ -14,13 +14,10 @@ pipeline {
     }
 
     stages {
-        stage("Git") {
-            steps {
-                git branch: 'develop', url: 'https://github.com/Ana3Lu/ProyectoFinalSF.git'
-            }
+
+        stage('SCM') {
+            checkout scm
         }
-
-
 
         stage('Check Java Version') {
             steps {
@@ -42,6 +39,12 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+             withSonarQubeEnv() {
+                sh "./gradlew sonar"
+             }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -49,6 +52,17 @@ pipeline {
                 }
             }
         }
+
+         stage ('Trivy verification') {
+            steps {
+                script {
+                    sh """
+                        docker run -u root -v $HOME/Library/Caches:/root/.cache/ -v /var/run/docker.sock:/var/run/docker.sock --name trivy_scan aquasec/trivy image --scanners vuln --severity CRITICAL --exit-code 1 ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}
+                    """
+                }
+            }
+         }
+
 
         stage('Login to DockerHub') {
             steps {
@@ -71,17 +85,7 @@ pipeline {
                 }
             }
         }
-
-         stage ('Trivy verification') {
-                    steps {
-                        script {
-                            sh """
-                            docker run -u root -v $HOME/Library/Caches:/root/.cache/ -v /var/run/docker.sock:/var/run/docker.sock --name trivy_scan aquasec/trivy image --scanners vuln --severity CRITICAL --exit-code 1 ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}
-                            """
-                        }
-                    }
-         }
-    }
+ }
 
     post {
         always {
