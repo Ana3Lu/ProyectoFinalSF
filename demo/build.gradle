@@ -6,12 +6,6 @@ plugins {
 	id "org.sonarqube" version "5.0.0.4638"
 }
 
-sonar {
-	properties {
-		property "sonar.projectKey", "Zoo"
-		property "sonar.projectName", "Zoo"
-	}
-}
 group = 'com.zooSabana'
 version = '0.0.1-SNAPSHOT'
 
@@ -74,3 +68,10 @@ tasks.jacocoTestCoverageVerification {
 }
 
 check.dependsOn jacocoTestCoverageVerification
+
+sonar {
+	properties {
+		property "sonar.projectKey", "Zoo"
+		property "sonar.projectName", "Zoo"
+	}
+}
