@@ -1,3 +1,14 @@
+void setBuildStatus(String message, String state) {
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Ana3Lu/ProyectoFinalSF.git"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
+}
+
+
 pipeline {
     agent any
 
@@ -14,12 +25,18 @@ pipeline {
     }
 
     stages {
-        stage("Git") {
-            steps {
-                git branch: 'develop', url: 'https://github.com/Ana3Lu/ProyectoFinalSF.git'
-            }
-        }
-
+       stage('Git') {
+                   steps {
+                       setBuildStatus("Build in progress", "PENDING");
+                       script {
+                           try {
+                               checkout scm
+                           } catch (Exception e) {
+                               error "Failed to clone repository: ${e.message}"
+                           }
+                       }
+                   }
+               }
 
 
         stage('Check Java Version') {
@@ -90,6 +107,12 @@ pipeline {
                 sh "docker rmi ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} || true"
                   sh 'docker rm -f trivy_scan || true'
             }
+        }
+        success {
+            setBuildStatus("Build succeeded", "SUCCESS");
+        }
+        failure {
+            setBuildStatus("Build failed", "FAILURE");
         }
     }
 }
