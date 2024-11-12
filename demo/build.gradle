@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.3.3'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'jacoco'
+	id "org.sonarqube" version "5.0.0.4638"
 }
 
 group = 'com.zooSabana'
@@ -75,3 +76,10 @@ tasks.jacocoTestCoverageVerification {
 }
 
 check.dependsOn jacocoTestCoverageVerification
+
+sonar {
+	properties {
+		property "sonar.projectKey", "Zoo"
+		property "sonar.projectName", "Zoo"
+	}
+}

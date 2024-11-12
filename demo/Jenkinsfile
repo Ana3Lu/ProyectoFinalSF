@@ -1,13 +1,12 @@
 void setBuildStatus(String message, String state) {
-  step([
-      $class: "GitHubCommitStatusSetter",
-      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Ana3Lu/ProyectoFinalSF.git"],
-      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
-      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
-      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
-  ]);
+    step([
+        $class: "GitHubCommitStatusSetter",
+        reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Ana3Lu/ProyectoFinalSF.git"],
+        contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+        errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+        statusResultSource: [$class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]]]
+    ]);
 }
-
 
 pipeline {
     agent any
@@ -21,23 +20,21 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
         DOCKERHUB_REPO = 'julizzy/zoo'
         DOCKERHUB_CREDENTIALS_ID = 'dcde267c-65cd-49a2-b04a-5b46e0ba17c9'
-
     }
 
     stages {
-       stage('Git') {
-                   steps {
-                       setBuildStatus("Build in progress", "PENDING");
-                       script {
-                           try {
-                               checkout scm
-                           } catch (Exception e) {
-                               error "Failed to clone repository: ${e.message}"
-                           }
-                       }
-                   }
-               }
-
+        stage('Git') {
+            steps {
+                setBuildStatus("Build in progress", "PENDING");
+                script {
+                    try {
+                        checkout scm
+                    } catch (Exception e) {
+                        error "Failed to clone repository: ${e.message}"
+                    }
+                }
+            }
+        }
 
         stage('Check Java Version') {
             steps {
@@ -50,7 +47,6 @@ pipeline {
             steps {
                 dir('./demo') {
                     script {
-
                         sh "/var/lib/jenkins/tools/jdk-17/bin/java -version"
                     }
                     sh 'chmod +x gradlew'
@@ -59,10 +55,28 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv() {
+                    sh "./gradlew sonar"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     def image = docker.build("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "-f demo/Dockerfile demo")
+                }
+            }
+        }
+
+        stage('Trivy verification') {
+            steps {
+                script {
+                    sh """
+                    docker run -u root -v $HOME/Library/Caches:/root/.cache/ -v /var/run/docker.sock:/var/run/docker.sock --name trivy_scan aquasec/trivy image --scanners vuln --severity CRITICAL --exit-code 1 ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}
+                    """
                 }
             }
         }
@@ -88,16 +102,6 @@ pipeline {
                 }
             }
         }
-
-         stage ('Trivy verification') {
-                    steps {
-                        script {
-                            sh """
-                            docker run -u root -v $HOME/Library/Caches:/root/.cache/ -v /var/run/docker.sock:/var/run/docker.sock --name trivy_scan aquasec/trivy image --scanners vuln --severity CRITICAL --exit-code 1 ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}
-                            """
-                        }
-                    }
-         }
     }
 
     post {
@@ -105,7 +109,7 @@ pipeline {
             script {
                 // Clean up Docker images on the agent
                 sh "docker rmi ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} || true"
-                  sh 'docker rm -f trivy_scan || true'
+                sh 'docker rm -f trivy_scan || true'
             }
         }
         success {
