@@ -1,8 +1,8 @@
 package com.zooSabana.demo.productores;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zooSabana.demo.logica.RegistroMedicoService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +13,9 @@ import java.util.Map;
 @Service
 public class ProductorAuditoria {
 
-    private RegistroMedicoService registroMedicoService;
+    private final RegistroMedicoService registroMedicoService;
+    private final RabbitTemplate rabbitTemplate;
 
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
     public ProductorAuditoria(RegistroMedicoService registroMedicoService, RabbitTemplate rabbitTemplate) {
         this.registroMedicoService = registroMedicoService;
         this.rabbitTemplate = rabbitTemplate;
@@ -31,8 +29,9 @@ public class ProductorAuditoria {
         }
 
         for (Map<String, Object> animal : animalesSinRevision) {
-            rabbitTemplate.convertAndSend("direct_exchange", "notificaciones", animal);
+            rabbitTemplate.convertAndSend("direct_exchange", "notificaciones", animal); // El RabbitTemplate debe manejar JSON
             rabbitTemplate.convertAndSend("direct_exchange", "auditoria", animal);
         }
     }
 }
+
