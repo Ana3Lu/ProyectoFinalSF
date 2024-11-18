@@ -1,4 +1,4 @@
-package com.zooSabana.demo;
+package com.zooSabana.demo.mensajeria.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;

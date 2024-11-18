@@ -1,6 +1,5 @@
-package com.zooSabana.demo;
+package com.zooSabana.demo.mensajeria.consumidores;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.zooSabana.demo.logica;
 
-import com.zooSabana.demo.productores.ProductorAuditoria;
+import com.zooSabana.demo.mensajeria.productores.ProductorAuditoria;
 import org.springframework.stereotype.Service;
 
 @Service

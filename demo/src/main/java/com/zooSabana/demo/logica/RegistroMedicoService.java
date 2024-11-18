@@ -1,11 +1,9 @@
 package com.zooSabana.demo.logica;
 
-import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
-import com.zooSabana.demo.productores.ProductorAuditoria;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

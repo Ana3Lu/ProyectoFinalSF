@@ -1,10 +1,7 @@
-package com.zooSabana.demo.productores;
+package com.zooSabana.demo.mensajeria.productores;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zooSabana.demo.logica.RegistroMedicoService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
