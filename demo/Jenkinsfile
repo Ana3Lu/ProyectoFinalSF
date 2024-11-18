@@ -57,7 +57,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv() {
+                withSonarQubeEnv('SonarQubeServer') { // Especifica el nombre configurado en "SonarQube installations"
                     sh "./gradlew sonar"
                 }
             }
