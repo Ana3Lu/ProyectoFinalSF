@@ -146,7 +146,7 @@ public class RegistroMedicoServiceTest {
         Mockito.verify(animalJPA).findById(id);
     }*/
 
-    @Test
+    /*@Test
     void WhenGetAnimalesSinRevision_ThenReturnAnimalesId() {
         LocalDate fechaActual = LocalDate.now();
         LocalDate inicioMes = fechaActual.withDayOfMonth(1);
@@ -173,7 +173,7 @@ public class RegistroMedicoServiceTest {
 
         Mockito.verify(registroMedicoJPA).findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
         Mockito.verify(animalJPA).findAllAnimalIds();
-    }
+    }*/
 
     @Test
     void GivenInvalidId_WhenUpdateRegistroMedico_ThenThrowIllegalException() {

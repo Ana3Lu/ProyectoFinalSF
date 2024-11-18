@@ -1,0 +1,18 @@
+package com.zooSabana.demo.logica;
+
+import com.zooSabana.demo.productores.ProductorAuditoria;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PublicacionService {
+
+    private final ProductorAuditoria productorAuditoria;
+
+    public PublicacionService(ProductorAuditoria productorAuditoria) {
+        this.productorAuditoria = productorAuditoria;
+    }
+
+    public void manejarPublicacion() {
+        productorAuditoria.publicarAnimalesSinRevision();
+    }
+}

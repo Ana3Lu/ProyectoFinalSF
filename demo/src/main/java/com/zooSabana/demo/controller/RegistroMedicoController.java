@@ -1,5 +1,6 @@
 package com.zooSabana.demo.controller;
 
+import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import com.zooSabana.demo.logica.RegistroMedicoService;
@@ -60,9 +61,16 @@ public class RegistroMedicoController {
         }
     }
 
-    @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
+    /*@GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
     public ResponseEntity<Object> getAnimalesIdSinRevision() {
         List<Long> animales = registroMedicoService.getAnimalesSinRevision();
+        return ResponseEntity.status(HttpStatus.OK).body(animales);
+
+    }*/
+
+    @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
+    public ResponseEntity<Object> getAnimalesIdSinRevision() {
+        List<Map<String, Object>> animales = registroMedicoService.getAnimalesSinRevision();
         return ResponseEntity.status(HttpStatus.OK).body(animales);
 
     }

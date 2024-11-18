@@ -1,14 +1,18 @@
 package com.zooSabana.demo.logica;
 
+import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
+import com.zooSabana.demo.productores.ProductorAuditoria;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -18,7 +22,6 @@ public class RegistroMedicoService {
     private RegistroMedicoJPA registroMedicoJPA;
 
     private AnimalJPA animalJPA;
-
 
     public void saveRegistroMedico(Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (animal_id < 0) {
@@ -65,7 +68,7 @@ public class RegistroMedicoService {
         return registrosMedicos;
     }
 
-    public List<Long> getAnimalesSinRevision() {
+    /*public List<Long> getAnimalesSinRevision() {
         LocalDate fechaActual = LocalDate.now();
         LocalDate inicioMes = fechaActual.withDayOfMonth(1);
 
@@ -74,6 +77,28 @@ public class RegistroMedicoService {
 
         return allAnimales.stream()
                 .filter(animal_id -> !animalesConControl.contains(animal_id))
+                .toList();
+    }*/
+
+    public List<Map<String, Object>> getAnimalesSinRevision() {
+        LocalDate fechaActual = LocalDate.now();
+        LocalDate inicioMes = fechaActual.withDayOfMonth(1);
+
+        List<Long> animalesConControl = registroMedicoJPA.findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
+        List<AnimalORM> allAnimales = animalJPA.findAll();
+
+        return allAnimales.stream()
+                .filter(animal -> !animalesConControl.contains(animal.getId()))
+                .map(animal -> {
+                    LocalDate ultimaFechaRevision = registroMedicoJPA.findUltimaFechaByAnimalId(animal.getId());
+
+                    Map<String, Object> datosAnimal = new HashMap<>();
+                    datosAnimal.put("id", animal.getId());
+                    datosAnimal.put("nombre", animal.getNombre());
+                    datosAnimal.put("especie", animal.getEspecie().getNombre());
+                    datosAnimal.put("ultimaFechaRevision", ultimaFechaRevision);
+                    return datosAnimal;
+                })
                 .toList();
     }
 
