@@ -75,7 +75,7 @@ public class RegistroMedicoController {
 
     }
 
-    @PutMapping(path = "/registro-medico/{id}")
+    @PutMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<String> updateRegistroMedico(@PathVariable Long id, @RequestBody RegistroMedicoDTO registroMedicoDTO) {
         try {
             registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
@@ -87,7 +87,7 @@ public class RegistroMedicoController {
         }
     }
 
-    @DeleteMapping(path = "/registro-medico/{id}")
+    @DeleteMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<String> deleteRegistroMedico(@PathVariable Long id) {
         try {
             registroMedicoService.deleteRegistroMedico(id);

@@ -228,7 +228,7 @@ public class RegistroMedicoControllerIntegrationTest {
     void shouldNotUpdateRegistroMedicoWithInvalidId() {
         long id = -5;
         RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.PUT,
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
@@ -238,7 +238,7 @@ public class RegistroMedicoControllerIntegrationTest {
     void shouldNotUpdateRegistroMedicoWithNonExistentId() {
         long id = 900;
         RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.PUT,
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
@@ -251,7 +251,7 @@ public class RegistroMedicoControllerIntegrationTest {
         nuevoRegistroMedico.setId(id);
         registroMedicoJPA.save(nuevoRegistroMedico);
 
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.DELETE, null, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Registro médico eliminado exitosamente", respuesta.getBody());
@@ -260,7 +260,7 @@ public class RegistroMedicoControllerIntegrationTest {
     @Test
     void shouldNotDeleteRegistroMedicoWithInvalidId() {
         long id = -5;
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.DELETE, null, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
     }
@@ -268,7 +268,7 @@ public class RegistroMedicoControllerIntegrationTest {
     @Test
     void shouldNotDeleteRegistroMedicoWithNonExistentId() {
         long id = 900;
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.DELETE, null, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
     }
