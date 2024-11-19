@@ -109,7 +109,6 @@ pipeline {
     post {
         always {
             script {
-                // Clean up Docker images on the agent
                 sh "docker rmi ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} || true"
                 sh 'docker rm -f trivy_scan || true'
             }
