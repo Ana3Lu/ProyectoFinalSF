@@ -1,6 +1,9 @@
 package com.zooSabana.demo.logica;
 
+import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
+import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,20 +24,36 @@ public class EspecieServiceTest {
     @Mock
     EspecieJPA especieJPA;
 
+    @Mock
+    CuidadorJPA cuidadorJPA;
+
     @InjectMocks
     EspecieService especieService;
 
     @Test
+    void GivenInvalidCuidadorId_WhenSaveEspecie_ThenThrowIllegalException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.saveEspecie(-5L, "Acuatico"));
+    }
+
+    @Test
     void GivenInvalidNombre_WhenSaveEspecie_ThenThrowIllegalException() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.saveEspecie(""));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.saveEspecie(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.saveEspecie(1L, ""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.saveEspecie(1L, null));
+    }
+
+    @Test
+    void GivenNonExistentCuidadorId_WhenSaveEspecie_ThenThrowNoSuchElementException() {
+        long id = 900;
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.saveEspecie(id, "Acuatico"));
     }
 
     @Test
     void WhenSaveEspecie_ThenEspecieIsSaved() {
+        long cuidadorId = 1L;
+        Mockito.when(cuidadorJPA.findById(cuidadorId)).thenReturn(Optional.of(new CuidadorORM()));
         Mockito.when(especieJPA.save(Mockito.any(EspecieORM.class))).thenReturn(new EspecieORM());
 
-        especieService.saveEspecie("Acuatico");
+        especieService.saveEspecie(cuidadorId, "Acuatico");
 
         Mockito.verify(especieJPA).save(Mockito.any(EspecieORM.class));
     }
@@ -49,6 +68,24 @@ public class EspecieServiceTest {
 
         Assertions.assertFalse(especiesObtenidas.isEmpty());
         Mockito.verify(especieJPA).findAll();
+    }
+
+    @Test
+    void GivenInvalidCuidadorId_WhenGetEspeciesByCuidador_ThenThrowIllegalException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.getEspeciesByCuidador(-5L));
+    }
+
+    @Test
+    void WhenGetEspeciesByCuidador_ThenReturnEspecies() {
+        long id = 1;
+        ArrayList<EspecieORM> especies = new ArrayList<>();
+        especies.add(new EspecieORM());
+        Mockito.when(especieJPA.findByCuidador_Id(id)).thenReturn(especies);
+
+        List<EspecieORM> especiesObtenidas = especieService.getEspeciesByCuidador(id);
+
+        Assertions.assertFalse(especiesObtenidas.isEmpty());
+        Mockito.verify(especieJPA).findByCuidador_Id(id);
     }
 
     @Test
@@ -78,24 +115,44 @@ public class EspecieServiceTest {
 
     @Test
     void GivenInvalidId_WhenUpdateEspecie_ThenThrowIllegalException() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.updateEspecie(-5L, "Acuatico"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.updateEspecie(-5L, 1L, "Acuatico"));
+    }
+
+    @Test
+    void GivenInvalidCuidadorId_WhenUpdateEspecie_ThenThrowIllegalException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.updateEspecie(1L,-5L, "Acuatico"));
+    }
+
+    @Test
+    void GivenInvalidNombre_WhenUpdateEspecie_ThenThrowIllegalException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.updateEspecie(1L, 1L, ""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> especieService.updateEspecie(1L, 1L, null));
+    }
+
+    @Test
+    void GivenNonExistentCuidadorId_WhenUpdateEspecie_ThenThrowNoSuchElementException() {
+        long id = 900;
+        Mockito.when(cuidadorJPA.findById(id)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.updateEspecie(1L, id, "Acuatico"));
+        Mockito.verify(cuidadorJPA).findById(id);
     }
 
     @Test
     void GivenNonExistentId_WhenUpdateEspecie_ThenThrowNoSuchElementException() {
         long id = 900;
-        Mockito.when(especieJPA.findById(id)).thenReturn(Optional.empty());
-
-        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.updateEspecie(id, "Acuatico"));
-        Mockito.verify(especieJPA).findById(id);
+        Assertions.assertThrows(NoSuchElementException.class, () -> especieService.updateEspecie(id, 1L, "Acuatico"));
     }
 
     @Test
     void WhenUpdateEspecie_ThenEspecieIsUpdated() {
         long id = 1;
-        Mockito.when(especieJPA.findById(id)).thenReturn(Optional.of(new EspecieORM()));
+        long cuidadorId = 1L;
 
-        especieService.updateEspecie(id, "Acuatico");
+        Mockito.when(especieJPA.findById(id)).thenReturn(Optional.of(new EspecieORM()));
+        Mockito.when(cuidadorJPA.findById(cuidadorId)).thenReturn(Optional.of(new CuidadorORM()));
+
+        especieService.updateEspecie(id, cuidadorId, "Mamifero");
 
         Mockito.verify(especieJPA).save(Mockito.any(EspecieORM.class));
     }

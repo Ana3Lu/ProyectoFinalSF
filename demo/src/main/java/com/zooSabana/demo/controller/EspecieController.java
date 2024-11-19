@@ -1,6 +1,8 @@
 package com.zooSabana.demo.controller;
 
+import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.controller.dto.EspecieDTO;
+import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import com.zooSabana.demo.logica.EspecieService;
 import lombok.AllArgsConstructor;
@@ -21,7 +23,7 @@ public class EspecieController {
     @PostMapping(path = "/especie")
     public ResponseEntity<String> createEspecie(@RequestBody EspecieDTO especieDTO) {
         try {
-            especieService.saveEspecie(especieDTO.nombre());
+            especieService.saveEspecie(especieDTO.cuidador_id(), especieDTO.nombre());
             return ResponseEntity.status(HttpStatus.CREATED).body("Especie guardada exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -32,6 +34,16 @@ public class EspecieController {
     public ResponseEntity<Object> getEspecies() {
         List<EspecieORM> especies = especieService.getEspecies();
         return ResponseEntity.status(HttpStatus.OK).body(especies);
+    }
+
+    @GetMapping(path = "/especies-cuidador")
+    public ResponseEntity<Object> getEspeciesByCuidador(@RequestParam Long cuidador_id) {
+        try {
+            List<EspecieORM> especies = especieService.getEspeciesByCuidador(cuidador_id);
+            return ResponseEntity.status(HttpStatus.OK).body(especies);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping(path = "/especies/{id}")
@@ -47,9 +59,9 @@ public class EspecieController {
     }
 
     @PutMapping(path = "/especies/{id}")
-    public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestBody String nombre) {
+    public ResponseEntity<String> updateEspecie(@PathVariable Long id, @RequestBody EspecieDTO especieDTO) {
         try {
-            especieService.updateEspecie(id, nombre);
+            especieService.updateEspecie(id, especieDTO.cuidador_id(), especieDTO.nombre());
             return ResponseEntity.status(HttpStatus.OK).body("Especie actualizada exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

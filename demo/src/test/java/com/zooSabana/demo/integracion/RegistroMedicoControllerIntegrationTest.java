@@ -2,9 +2,11 @@ package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
+import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
@@ -41,6 +43,9 @@ public class RegistroMedicoControllerIntegrationTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @Autowired
+    private CuidadorJPA cuidadorJPA;
+
     @BeforeEach
     void setUp() {
         registroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2024, 7, 1), "Saludable", "Carnivoro", "Tranquilo");
@@ -48,8 +53,14 @@ public class RegistroMedicoControllerIntegrationTest {
 
     @Test
     void shouldCreateRegistroMedicoSuccessfully() {
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Perez");
+        cuidador.setEmail("juan.perez@example.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
         EspecieORM especie = new EspecieORM();
-        especie.setNombre("Perro");
+        especie.setCuidador(cuidador);
+        especie.setNombre("Mamifero");
         especie = especieJPA.save(especie);
 
         AnimalORM animal = new AnimalORM();
@@ -116,8 +127,14 @@ public class RegistroMedicoControllerIntegrationTest {
 
     @Test
     void shouldGetRegistroMedicoByAnimalIdSuccessfully() {
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Perez");
+        cuidador.setEmail("juan.perez@example.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
         EspecieORM especie = new EspecieORM();
-        especie.setNombre("Perro");
+        especie.setCuidador(cuidador);
+        especie.setNombre("Mamifero");
         especie = especieJPA.save(especie);
 
         AnimalORM animal = new AnimalORM();
@@ -211,20 +228,20 @@ public class RegistroMedicoControllerIntegrationTest {
     void shouldNotUpdateRegistroMedicoWithInvalidId() {
         long id = -5;
         RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+        Assertions.assertEquals("ID de registro médico inválido", respuesta.getBody());
     }
 
     @Test
     void shouldNotUpdateRegistroMedicoWithNonExistentId() {
         long id = 900;
         RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registro-medico/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        Assertions.assertEquals("Especie no encontrada", respuesta.getBody());
+        Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
     }
 
     @Test

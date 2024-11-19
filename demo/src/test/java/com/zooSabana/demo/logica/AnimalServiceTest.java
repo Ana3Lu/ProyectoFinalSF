@@ -161,6 +161,7 @@ public class AnimalServiceTest {
     @Test
     void GivenNonExistentId_WhenUpdateAnimal_ThenThrowNoSuchElementException() {
         long id = 900;
+
         Assertions.assertThrows(NoSuchElementException.class, () -> animalService.updateAnimal(id, 1L, "Panda",1));
     }
 

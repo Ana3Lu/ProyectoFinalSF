@@ -1,6 +1,7 @@
 package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.AnimalDTO;
+import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
@@ -53,6 +54,22 @@ public class AnimalControllerIntegrationTest {
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotCreateAnimalWithInvalidName() {
+        animalDTO = new AnimalDTO(1L, "", 3);
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Nombre de animal inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotCreateAnimalWithInvalidEdad() {
+        animalDTO = new AnimalDTO(1L, "Canguro", -3);
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Edad de animal inválida", respuesta.getBody());
     }
 
     @Test
@@ -157,7 +174,6 @@ public class AnimalControllerIntegrationTest {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals("ID de animal inválido", response.getBody());
-
     }
 
     @Test
