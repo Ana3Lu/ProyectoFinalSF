@@ -1,9 +1,12 @@
 package com.zooSabana.demo.mensajeria.productores;
 
+import com.zooSabana.demo.logica.CuidadorService;
+import com.zooSabana.demo.logica.EspecieService;
 import com.zooSabana.demo.logica.RegistroMedicoService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +29,10 @@ public class ProductorAuditoria {
         }
 
         for (Map<String, Object> animal : animalesSinRevision) {
-            rabbitTemplate.convertAndSend("direct_exchange", "notificaciones", animal); // El RabbitTemplate debe manejar JSON
+            rabbitTemplate.convertAndSend("direct_exchange", "notificaciones", animal);
             rabbitTemplate.convertAndSend("direct_exchange", "auditoria", animal);
         }
     }
 }
+
 

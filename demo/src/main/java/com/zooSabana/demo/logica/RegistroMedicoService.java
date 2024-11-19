@@ -66,18 +66,6 @@ public class RegistroMedicoService {
         return registrosMedicos;
     }
 
-    /*public List<Long> getAnimalesSinRevision() {
-        LocalDate fechaActual = LocalDate.now();
-        LocalDate inicioMes = fechaActual.withDayOfMonth(1);
-
-        List<Long> animalesConControl = registroMedicoJPA.findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
-        List<Long> allAnimales = animalJPA.findAllAnimalIds();
-
-        return allAnimales.stream()
-                .filter(animal_id -> !animalesConControl.contains(animal_id))
-                .toList();
-    }*/
-
     public List<Map<String, Object>> getAnimalesSinRevision() {
         LocalDate fechaActual = LocalDate.now();
         LocalDate inicioMes = fechaActual.withDayOfMonth(1);
@@ -95,6 +83,8 @@ public class RegistroMedicoService {
                     datosAnimal.put("nombre", animal.getNombre());
                     datosAnimal.put("especie", animal.getEspecie().getNombre());
                     datosAnimal.put("ultimaFechaRevision", ultimaFechaRevision);
+                    datosAnimal.put("cuidador", animal.getEspecie().getCuidador().getNombre());
+                    datosAnimal.put("emailCuidador", animal.getEspecie().getCuidador().getEmail());
                     return datosAnimal;
                 })
                 .toList();

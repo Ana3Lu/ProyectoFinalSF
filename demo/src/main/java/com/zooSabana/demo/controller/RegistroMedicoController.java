@@ -61,13 +61,6 @@ public class RegistroMedicoController {
         }
     }
 
-    /*@GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
-    public ResponseEntity<Object> getAnimalesIdSinRevision() {
-        List<Long> animales = registroMedicoService.getAnimalesSinRevision();
-        return ResponseEntity.status(HttpStatus.OK).body(animales);
-
-    }*/
-
     @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
     public ResponseEntity<Object> getAnimalesIdSinRevision() {
         List<Map<String, Object>> animales = registroMedicoService.getAnimalesSinRevision();
