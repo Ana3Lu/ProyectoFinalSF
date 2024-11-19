@@ -59,7 +59,7 @@ pipeline {
             steps {
                 dir('./demo') {
                     withSonarQubeEnv('SonarQubeServer') {
-                        sh './gradlew sonar'
+                        sh './gradlew clean build sonar --info'
                     }
                 }
             }
