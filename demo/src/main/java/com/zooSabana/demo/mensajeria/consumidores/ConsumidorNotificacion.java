@@ -5,6 +5,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,24 +18,38 @@ public class ConsumidorNotificacion {
     }
 
     @RabbitListener(queues = "revisiones_pendientes")
-    public void procesarNotificacion(Map<String, Object> mensaje) {
-        System.out.println("Notificación recibida: " + mensaje);
+        public void procesarNotificacion(Map<String, Object> mensaje) {
+        try {
+            Object fechaRaw = mensaje.get("ultimaFechaRevision");
+            LocalDate ultimaFechaRevision = null;
 
-        String email = (String) mensaje.get("emailCuidador");
-        String nombreCuidador = (String) mensaje.get("cuidador");
-        String nombreAnimal = (String) mensaje.get("nombre");
-        String especie = (String) mensaje.get("especie");
-        LocalDate ultimaRevision = (LocalDate) mensaje.get("ultimaFechaRevision");
+            if (fechaRaw instanceof List) {
+                List<Integer> fechaList = (List<Integer>) fechaRaw;
+                ultimaFechaRevision = LocalDate.of(fechaList.get(0), fechaList.get(1), fechaList.get(2));
+            }
 
-        String asunto = "Revisión pendiente para " + nombreAnimal;
-        String cuerpo = "Hola " + nombreCuidador + ",\n\n"
-                + "El animal " + nombreAnimal + " (Especie: " + especie + ") "
-                + "tiene pendiente una revisión mensual desde la fecha: " + ultimaRevision + ".\n\n"
-                + "Por favor, realiza la revisión lo antes posible.\n\n"
-                + "Saludos,\nZoo Sabana";
+            String nombre = (String) mensaje.get("nombre");
+            String cuidador = (String) mensaje.get("cuidador");
+            String especie = (String) mensaje.get("especie");
+            String emailCuidador = (String) mensaje.get("emailCuidador");
 
-        emailService.enviarEmail(email, asunto, cuerpo);
+            System.out.printf("Notificación recibida de animal pendiente de revisión médica en el mes. Detalles: %s (%s). Cuidador: %s, Email: %s, Última Revisión del animal: %s%n",
+                    nombre, especie, cuidador, emailCuidador, ultimaFechaRevision);
+
+            String asunto = "Revisión pendiente para " + nombre;
+            String cuerpo = "Hola " + cuidador + ",\n\n"
+                    + "El animal " + nombre + " (Especie: " + especie + ") "
+                    + "tiene pendiente la revisión del mes actual.\n\n"
+                    + "Por favor, realizarla lo más pronto posible.\n\n"
+                    + "Saludos,\nZoo Sabana\n\n";
+
+            emailService.enviarEmail(emailCuidador, asunto, cuerpo);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al procesar la notificación", e);
+        }
     }
+
 }
 
 

@@ -16,7 +16,7 @@ public class RabbitMQController {
         this.publicacionService = publicacionService;
     }
 
-    @PostMapping("/publicar")
+    @PostMapping("/alerta-revision-pendiente-mes")
     public ResponseEntity<String> publicarAnimalesSinRevision() {
         publicacionService.manejarPublicacion();
         return ResponseEntity.ok("Mensajes publicados en RabbitMQ");

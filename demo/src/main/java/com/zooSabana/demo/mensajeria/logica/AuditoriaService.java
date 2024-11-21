@@ -9,6 +9,6 @@ public class AuditoriaService {
 
     public void registrarEvento(Map<String, Object> mensaje) {
         // Simulación
-        System.out.println("Registrando evento en auditoría: " + mensaje);
+        System.out.println("Registrando evento en el log de auditoría: " + mensaje + "\n");
     }
 }

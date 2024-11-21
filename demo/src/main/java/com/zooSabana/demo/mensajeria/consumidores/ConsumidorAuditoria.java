@@ -17,7 +17,7 @@ public class ConsumidorAuditoria {
 
     @RabbitListener(queues = "eventos_auditoria")
     public void registrarAuditoria(Map<String, Object> mensaje) {
-        System.out.println("Evento recibido en auditoría: " + mensaje);
+        System.out.println("Evento recibido para log de auditoría: " + mensaje + "\n");
 
         auditoriaService.registrarEvento(mensaje);
     }
