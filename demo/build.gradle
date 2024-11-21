@@ -31,7 +31,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.springdoc:springdoc-openapi-data-rest:1.7.0'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'com.h2database:h2:2.2.222'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
