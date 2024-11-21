@@ -1,4 +1,4 @@
-package com.zooSabana.demo.mensajeria.config;
+package com.zooSabana.demo.config;
 
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

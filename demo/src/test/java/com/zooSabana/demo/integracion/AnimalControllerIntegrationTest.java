@@ -3,8 +3,10 @@ package com.zooSabana.demo.integracion;
 import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
+import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,11 +36,24 @@ public class AnimalControllerIntegrationTest {
     EspecieJPA especieJPA;
 
     @Autowired
+    CuidadorJPA cuidadorJPA;
+
+    @Autowired
     private TestRestTemplate testRestTemplate;
 
     @BeforeEach
     void setUp() {
-       animalDTO = new AnimalDTO(1L, "Canguro", 3);
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Perez");
+        cuidador.setEmail("juan.perez@example.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Canguro");
+        especie.setCuidador(cuidador);
+        especie = especieJPA.save(especie);
+
+        animalDTO = new AnimalDTO(especie.getId(), "Canguro", 3);
     }
 
     @Test

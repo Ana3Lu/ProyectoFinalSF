@@ -1,8 +1,7 @@
 package com.zooSabana.demo.integracion;
 
-import com.zooSabana.demo.controller.dto.AnimalDTO;
+import com.zooSabana.demo.controller.dto.CuidadorDTO;
 import com.zooSabana.demo.controller.dto.EspecieDTO;
-import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -40,28 +40,27 @@ public class EspecieControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        especieDTO = new EspecieDTO(1L,"Mamifero");
-
         CuidadorORM cuidador = new CuidadorORM();
-        cuidador.setId(1L);
         cuidador.setNombre("Juan Perez");
         cuidador.setEmail("juan.perez@example.com");
-        cuidadorJPA.save(cuidador);
+        cuidador = cuidadorJPA.save(cuidador);
+
+        especieDTO = new EspecieDTO(cuidador.getId(), "Mamifero");
     }
 
     @Test
     void shouldCreateEspecieSuccessfully() {
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
-        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(HttpStatus.CREATED, respuesta.getStatusCode());
         Assertions.assertEquals("Especie guardada exitosamente", respuesta.getBody());
     }
 
     @Test
     void shouldNotCreateEspecieWithInvalidCuidadorId() {
         especieDTO = new EspecieDTO(-1L, "Mamifero");
-        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", especieDTO, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/especie", especieDTO, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
-        //Assertions.assertEquals("ID de cuidador inválido", respuesta.getBody());
+        Assertions.assertEquals("ID de cuidador inválido", respuesta.getBody());
     }
 
     @Test
@@ -179,12 +178,19 @@ public class EspecieControllerIntegrationTest {
 
     @Test
     void shouldDeleteEspecieSuccessfully() {
-        long id = 1;
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setId(1L);
+        cuidador.setNombre("Juan Perez");
+        cuidador.setEmail("juan.perez@example.com");
+        cuidadorJPA.save(cuidador);
+
         EspecieORM nuevaEspecie = new EspecieORM();
-        nuevaEspecie.setId(id);
+        nuevaEspecie.setId(1L);
+        nuevaEspecie.setNombre("Perro");
+        nuevaEspecie.setCuidador(cuidador);
         especieJPA.save(nuevaEspecie);
 
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + nuevaEspecie.getId(), HttpMethod.DELETE, null, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Especie eliminada exitosamente", respuesta.getBody());

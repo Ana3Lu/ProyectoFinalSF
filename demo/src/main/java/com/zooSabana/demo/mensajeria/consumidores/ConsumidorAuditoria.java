@@ -1,6 +1,6 @@
 package com.zooSabana.demo.mensajeria.consumidores;
 
-import com.zooSabana.demo.logica.AuditoriaService;
+import com.zooSabana.demo.mensajeria.logica.AuditoriaService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 

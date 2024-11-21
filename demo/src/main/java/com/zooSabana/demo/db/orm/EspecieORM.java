@@ -16,11 +16,10 @@ public class EspecieORM {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String nombre;
-
     @ManyToOne
     @JoinColumn(name = "cuidador_id")
     private CuidadorORM cuidador;
 
+    @Column
+    private String nombre;
 }

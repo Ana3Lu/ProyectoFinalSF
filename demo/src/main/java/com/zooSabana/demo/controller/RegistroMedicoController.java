@@ -11,85 +11,47 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class RegistroMedicoController {
 
     private RegistroMedicoService registroMedicoService;
 
-
     @PostMapping(path = "/registro-medico")
     public ResponseEntity<String> createRegistroMedico(@RequestBody RegistroMedicoDTO registroMedicoDTO) {
-        try {
-            registroMedicoService.saveRegistroMedico(registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registro médico guardado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        registroMedicoService.saveRegistroMedico(registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Registro médico guardado exitosamente");
     }
 
     @GetMapping(path = "/registros-medicos")
-    public ResponseEntity<List<RegistroMedicoORM>> getRegistrosMedicos() {
-        List<RegistroMedicoORM> registros = registroMedicoService.getRegistrosMedicos();
-        return ResponseEntity.status(HttpStatus.OK).body(registros);
+    public ResponseEntity<Object> getRegistrosMedicos() {
+        return ResponseEntity.status(HttpStatus.OK).body(registroMedicoService.getRegistrosMedicos());
     }
 
     @GetMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<Object> getRegistroMedicoById(@PathVariable Long id) {
-        try {
-            RegistroMedicoORM registro = registroMedicoService.getRegistroMedico(id);
-            return ResponseEntity.status(HttpStatus.OK).body(registro);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(registroMedicoService.getRegistroMedico(id));
     }
 
     @GetMapping(path = "/registros-medicos/animales/{animal_id}")
     public ResponseEntity<Object> getRegistrosMedicosByAnimal(@PathVariable Long animal_id) {
-        try {
-            List<RegistroMedicoORM> registrosMedicos = registroMedicoService.getRegistrosMedicosByAnimal(animal_id);
-            return ResponseEntity.status(HttpStatus.OK).body(registrosMedicos);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(registroMedicoService.getRegistrosMedicosByAnimal(animal_id));
     }
 
     @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
-    public ResponseEntity<Object> getAnimalesIdSinRevision() {
-        List<Map<String, Object>> animales = registroMedicoService.getAnimalesSinRevision();
-        return ResponseEntity.status(HttpStatus.OK).body(animales);
-
+    public ResponseEntity<Object> getAnimalesSinRevision() {
+        return ResponseEntity.status(HttpStatus.OK).body(registroMedicoService.getAnimalesSinRevision());
     }
 
     @PutMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<String> updateRegistroMedico(@PathVariable Long id, @RequestBody RegistroMedicoDTO registroMedicoDTO) {
-        try {
-            registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
-            return ResponseEntity.status(HttpStatus.OK).body("Registro médico actualizado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        registroMedicoService.updateRegistroMedico(id, registroMedicoDTO.animal_id(), registroMedicoDTO.fecha(), registroMedicoDTO.estado(), registroMedicoDTO.dieta(), registroMedicoDTO.comportamiento());
+        return ResponseEntity.status(HttpStatus.OK).body("Registro médico actualizado exitosamente");
     }
 
     @DeleteMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<String> deleteRegistroMedico(@PathVariable Long id) {
-        try {
-            registroMedicoService.deleteRegistroMedico(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Registro médico eliminado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        registroMedicoService.deleteRegistroMedico(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Registro médico eliminado exitosamente");
     }
-
 }

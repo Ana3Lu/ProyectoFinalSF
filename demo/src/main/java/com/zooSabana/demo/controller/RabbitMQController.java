@@ -1,6 +1,6 @@
 package com.zooSabana.demo.controller;
 
-import com.zooSabana.demo.logica.PublicacionService;
+import com.zooSabana.demo.mensajeria.logica.PublicacionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

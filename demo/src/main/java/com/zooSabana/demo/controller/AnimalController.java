@@ -12,73 +12,42 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class AnimalController {
 
     private AnimalService animalService;
 
-
     @PostMapping(path = "/animal")
     public ResponseEntity<String> createAnimal(@RequestBody AnimalDTO animalDTO) {
-        try {
-            animalService.saveAnimal(animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Animal guardado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        animalService.saveAnimal(animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Animal guardado exitosamente");
     }
 
     @GetMapping(path = "/animales")
     public ResponseEntity<Object> getAnimales() {
-        List<AnimalORM> animales = animalService.getAnimales();
-        return ResponseEntity.status(HttpStatus.OK).body(animales);
+        return ResponseEntity.status(HttpStatus.OK).body(animalService.getAnimales());
     }
 
     @GetMapping(path = "/animales-especie")
     public ResponseEntity<Object> getAnimalesByEspecie(@RequestParam Long especie_id) {
-        try {
-            List<AnimalORM> animales = animalService.getAnimalesByEspecie(especie_id);
-            return ResponseEntity.status(HttpStatus.OK).body(animales);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(animalService.getAnimalesByEspecie(especie_id));
     }
 
     @GetMapping(path = "/animales/{id}")
     public ResponseEntity<Object> getAnimalById(@PathVariable Long id) {
-        try {
-            AnimalORM animal = animalService.getAnimal(id);
-            return ResponseEntity.status(HttpStatus.OK).body(animal);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(animalService.getAnimal(id));
     }
 
     @PutMapping(path = "/animales/{id}")
     public ResponseEntity<String> updateAnimal(@PathVariable Long id, @RequestBody AnimalDTO animalDTO) {
-      try {
-          animalService.updateAnimal(id, animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
-          return ResponseEntity.status(HttpStatus.OK).body("Animal actualizado exitosamente");
-      } catch (IllegalArgumentException e) {
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-      } catch (NoSuchElementException e) {
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-      }
+        animalService.updateAnimal(id, animalDTO.especie_id(), animalDTO.nombre(), animalDTO.edad());
+        return ResponseEntity.status(HttpStatus.OK).body("Animal actualizado exitosamente");
     }
 
     @DeleteMapping(path = "/animales/{id}")
     public ResponseEntity<String> deleteAnimal(@PathVariable Long id) {
-        try {
-            animalService.deleteAnimal(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Animal eliminado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        animalService.deleteAnimal(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Animal eliminado exitosamente");
     }
 }

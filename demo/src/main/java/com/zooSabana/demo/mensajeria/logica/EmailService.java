@@ -1,4 +1,4 @@
-package com.zooSabana.demo.logica;
+package com.zooSabana.demo.mensajeria.logica;
 
 import org.springframework.stereotype.Service;
 

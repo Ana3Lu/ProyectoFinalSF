@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class CuidadorController {
@@ -21,53 +20,29 @@ public class CuidadorController {
 
     @PostMapping(path = "/cuidador")
     public ResponseEntity<String> createCuidador(@RequestBody CuidadorDTO cuidadorDTO) {
-        try {
-            cuidadorService.saveCuidador(cuidadorDTO.nombre(), cuidadorDTO.email());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Cuidador guardado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        cuidadorService.saveCuidador(cuidadorDTO.nombre(), cuidadorDTO.email());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Cuidador guardado exitosamente");
     }
 
     @GetMapping(path = "/cuidadores")
-    public ResponseEntity<Object> getEspecies() {
-        List<CuidadorORM> cuidadores = cuidadorService.getCuidadores();
-        return ResponseEntity.status(HttpStatus.OK).body(cuidadores);
+    public ResponseEntity<Object> getCuidadores() {
+        return ResponseEntity.status(HttpStatus.OK).body(cuidadorService.getCuidadores());
     }
 
     @GetMapping(path = "/cuidadores/{id}")
     public ResponseEntity<Object> getCuidadorById(@PathVariable Long id) {
-        try {
-            CuidadorORM cuidador = cuidadorService.getCuidador(id);
-            return ResponseEntity.status(HttpStatus.OK).body(cuidador);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(cuidadorService.getCuidador(id));
     }
 
     @PutMapping(path = "/cuidadores/{id}")
     public ResponseEntity<String> updateCuidador(@PathVariable Long id, @RequestBody CuidadorDTO cuidadorDTO) {
-        try {
-            cuidadorService.updateCuidador(id, cuidadorDTO.nombre(), cuidadorDTO.email());
-            return ResponseEntity.status(HttpStatus.OK).body("Cuidador actualizado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        cuidadorService.updateCuidador(id, cuidadorDTO.nombre(), cuidadorDTO.email());
+        return ResponseEntity.status(HttpStatus.OK).body("Cuidador actualizado exitosamente");
     }
 
     @DeleteMapping(path = "/cuidadores/{id}")
     public ResponseEntity<String> deleteCuidador(@PathVariable Long id) {
-        try {
-            cuidadorService.deleteCuidador(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Cuidador eliminado exitosamente");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        cuidadorService.deleteCuidador(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Cuidador eliminado exitosamente");
     }
 }
