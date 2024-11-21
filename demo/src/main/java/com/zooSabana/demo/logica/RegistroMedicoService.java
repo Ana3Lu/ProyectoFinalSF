@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -18,7 +20,6 @@ public class RegistroMedicoService {
     private RegistroMedicoJPA registroMedicoJPA;
 
     private AnimalJPA animalJPA;
-
 
     public void saveRegistroMedico(Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (animal_id < 0) {
@@ -65,17 +66,31 @@ public class RegistroMedicoService {
         return registrosMedicos;
     }
 
-    public List<Long> getAnimalesSinRevision() {
+    public List<Map<String, Object>> getAnimalesSinRevision() {
         LocalDate fechaActual = LocalDate.now();
         LocalDate inicioMes = fechaActual.withDayOfMonth(1);
 
         List<Long> animalesConControl = registroMedicoJPA.findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
-        List<Long> allAnimales = animalJPA.findAllAnimalIds();
+        List<AnimalORM> allAnimales = animalJPA.findAll();
 
         return allAnimales.stream()
-                .filter(animal_id -> !animalesConControl.contains(animal_id))
+                .filter(animal -> !animalesConControl.contains(animal.getId()))
+                .map(animal -> {
+                    LocalDate ultimaFechaRevision = registroMedicoJPA.findUltimaFechaByAnimalId(animal.getId());
+
+                    Map<String, Object> datosAnimal = new HashMap<>();
+                    datosAnimal.put("id", animal.getId());
+                    datosAnimal.put("nombre", animal.getNombre());
+                    datosAnimal.put("especie", animal.getEspecie().getNombre());
+                    datosAnimal.put("ultimaFechaRevision", ultimaFechaRevision);
+                    datosAnimal.put("cuidador", animal.getEspecie().getCuidador().getNombre());
+                    datosAnimal.put("emailCuidador", animal.getEspecie().getCuidador().getEmail());
+                    return datosAnimal;
+                })
                 .toList();
     }
+
+
 
     public void updateRegistroMedico(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (id < 0) {

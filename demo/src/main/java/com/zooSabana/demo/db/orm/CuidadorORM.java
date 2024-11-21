@@ -5,21 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "especies")
+@Table(name = "cuidadores")
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EspecieORM {
+public class CuidadorORM {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "cuidador_id")
-    private CuidadorORM cuidador;
-
     @Column
     private String nombre;
+
+    @Column
+    private String email;
 }

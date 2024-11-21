@@ -3,6 +3,8 @@ package com.zooSabana.demo.logica;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.RegistroMedicoJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.CuidadorORM;
+import com.zooSabana.demo.db.orm.EspecieORM;
 import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RegistroMedicoServiceTest {
@@ -135,45 +134,73 @@ public class RegistroMedicoServiceTest {
         Mockito.verify(registroMedicoJPA).findByAnimal_Id(id);
     }
 
-    /*@Test
-    void GivenNonExistentEspecieId_WhenGetAnimalesByEspecie_ThenThrowNoSuchElementException() {
-        long id = 900;
-        Mockito.when(animalJPA.findById(id)).thenReturn(Optional.empty());
+    @Test
+    void GivenNonExistentAnimalId_WhenGetRegistrosMedicosByAnimal_ThenThrowNoSuchElementException() {
+        long animalId = 900;
+        Mockito.when(registroMedicoJPA.findByAnimal_Id(animalId)).thenReturn(List.of());
 
         Assertions.assertThrows(NoSuchElementException.class, () -> {
-            RegistroMedicoService.getRegistrosMedicosByAnimal(id);
+            registroMedicoService.getRegistrosMedicosByAnimal(animalId);
         });
-        Mockito.verify(animalJPA).findById(id);
-    }*/
+
+        Mockito.verify(registroMedicoJPA).findByAnimal_Id(animalId);
+    }
+
 
     @Test
-    void WhenGetAnimalesSinRevision_ThenReturnAnimalesId() {
+    void WhenGetAnimalesSinRevision_ThenReturnAnimales() {
         LocalDate fechaActual = LocalDate.now();
         LocalDate inicioMes = fechaActual.withDayOfMonth(1);
 
-        List<Long> animalesConControl = new ArrayList<>();
-        animalesConControl.add(1L);
-        animalesConControl.add(2L);
+        List<Long> animalesConControl = List.of(1L, 2L);
 
-        List<Long> allAnimales = new ArrayList<>();
-        allAnimales.add(1L);
-        allAnimales.add(2L);
-        allAnimales.add(3L);
-        allAnimales.add(4L);
+        CuidadorORM cuidador = new CuidadorORM(1L,"Juan Perez", "zooUser@zoo.com");
+
+        EspecieORM especie1 = new EspecieORM(1L, cuidador, "Mamífero"); // `null` para el cuidador por simplicidad
+        EspecieORM especie2 = new EspecieORM(2L, cuidador, "Felino");
+
+        AnimalORM animal1 = new AnimalORM(1L, especie1, "León", 8);
+        AnimalORM animal2 = new AnimalORM(2L, especie1, "Cebra", 6);
+        AnimalORM animal3 = new AnimalORM(3L, especie2, "Elefante", 10);
+        AnimalORM animal4 = new AnimalORM(4L, especie2, "Tigre", 5);
+
+        List<AnimalORM> allAnimales = List.of(animal1, animal2, animal3, animal4);
 
         Mockito.when(registroMedicoJPA.findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual)).thenReturn(animalesConControl);
-        Mockito.when(animalJPA.findAllAnimalIds()).thenReturn(allAnimales);
+        Mockito.when(animalJPA.findAll()).thenReturn(allAnimales);
+        Mockito.when(registroMedicoJPA.findUltimaFechaByAnimalId(3L)).thenReturn(LocalDate.of(2023, 12, 25));
+        Mockito.when(registroMedicoJPA.findUltimaFechaByAnimalId(4L)).thenReturn(null);
 
-        List<Long> animalesSinRevision = registroMedicoService.getAnimalesSinRevision();
+        List<Map<String, Object>> animalesSinRevision = registroMedicoService.getAnimalesSinRevision();
 
         Assertions.assertNotNull(animalesSinRevision);
         Assertions.assertEquals(2, animalesSinRevision.size());
-        Assertions.assertTrue(animalesSinRevision.contains(3L));
-        Assertions.assertTrue(animalesSinRevision.contains(4L));
+
+        Map<String, Object> animal3Data = animalesSinRevision.stream()
+                .filter(animal -> animal.get("id").equals(3L))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Animal 3 no encontrado en la lista"));
+        Assertions.assertEquals(3L, animal3Data.get("id"));
+        Assertions.assertEquals("Elefante", animal3Data.get("nombre"));
+        Assertions.assertEquals("Felino", animal3Data.get("especie"));
+        Assertions.assertEquals(LocalDate.of(2023, 12, 25), animal3Data.get("ultimaFechaRevision"));
+
+        Map<String, Object> animal4Data = animalesSinRevision.stream()
+                .filter(animal -> animal.get("id").equals(4L))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Animal 4 no encontrado en la lista"));
+        Assertions.assertEquals(4L, animal4Data.get("id"));
+        Assertions.assertEquals("Tigre", animal4Data.get("nombre"));
+        Assertions.assertEquals("Felino", animal4Data.get("especie"));
+        Assertions.assertNull(animal4Data.get("ultimaFechaRevision"));
 
         Mockito.verify(registroMedicoJPA).findDistinctAnimalIdsByFechaBetween(inicioMes, fechaActual);
-        Mockito.verify(animalJPA).findAllAnimalIds();
+        Mockito.verify(animalJPA).findAll();
+        Mockito.verify(registroMedicoJPA).findUltimaFechaByAnimalId(3L);
+        Mockito.verify(registroMedicoJPA).findUltimaFechaByAnimalId(4L);
     }
+
+
 
     @Test
     void GivenInvalidId_WhenUpdateRegistroMedico_ThenThrowIllegalException() {

@@ -2,8 +2,10 @@ package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
+import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
+import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,11 +35,24 @@ public class AnimalControllerIntegrationTest {
     EspecieJPA especieJPA;
 
     @Autowired
+    CuidadorJPA cuidadorJPA;
+
+    @Autowired
     private TestRestTemplate testRestTemplate;
 
     @BeforeEach
     void setUp() {
-       animalDTO = new AnimalDTO(1L, "Canguro", 3);
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Perez");
+        cuidador.setEmail("juan.perez@example.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Canguro");
+        especie.setCuidador(cuidador);
+        especie = especieJPA.save(especie);
+
+        animalDTO = new AnimalDTO(especie.getId(), "Canguro", 3);
     }
 
     @Test
@@ -53,6 +68,22 @@ public class AnimalControllerIntegrationTest {
         ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("ID de especie inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotCreateAnimalWithInvalidName() {
+        animalDTO = new AnimalDTO(1L, "", 3);
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Nombre de animal inválido", respuesta.getBody());
+    }
+
+    @Test
+    void shouldNotCreateAnimalWithInvalidEdad() {
+        animalDTO = new AnimalDTO(1L, "Canguro", -3);
+        ResponseEntity<String> respuesta = testRestTemplate.postForEntity("/animal", animalDTO, String.class);
+        Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
+        Assertions.assertEquals("Edad de animal inválida", respuesta.getBody());
     }
 
     @Test
@@ -130,14 +161,14 @@ public class AnimalControllerIntegrationTest {
 
     @Test
     void shouldNotUpdateAnimalWithNonExistentId() {
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador = cuidadorJPA.save(cuidador);
+
         EspecieORM especie = new EspecieORM();
+        especie.setCuidador(cuidador);
         especie = especieJPA.save(especie);
 
-        AnimalORM animal = new AnimalORM();
-        animal.setEspecie(especie);
-        animal = animalJPA.save(animal);
-
-        AnimalDTO animalDTO = new AnimalDTO(1L, "Perro", 5);
+        AnimalDTO animalDTO = new AnimalDTO(especie.getId(), "Perro", 5);
 
         ResponseEntity<String> response = testRestTemplate.exchange("/animales/900", HttpMethod.PUT,
                 new HttpEntity<>(animalDTO), String.class
@@ -157,17 +188,25 @@ public class AnimalControllerIntegrationTest {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals("ID de animal inválido", response.getBody());
-
     }
 
     @Test
     void shouldDeleteAnimalSuccessfully() {
-        long id = 1;
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Pérez");
+        cuidador.setEmail("juan.perez@zooUser.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
+        EspecieORM especie = new EspecieORM();
+        especie.setCuidador(cuidador);
+        especie.setNombre("Perro");
+        especie = especieJPA.save(especie);
+
         AnimalORM nuevoAnimal = new AnimalORM();
-        nuevoAnimal.setId(id);
+        nuevoAnimal.setEspecie(especie);
         animalJPA.save(nuevoAnimal);
 
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + nuevoAnimal.getId(), HttpMethod.DELETE, null, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Animal eliminado exitosamente", respuesta.getBody());

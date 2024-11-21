@@ -15,4 +15,7 @@ public interface RegistroMedicoJPA extends JpaRepository<RegistroMedicoORM, Long
 
     @Query("SELECT DISTINCT r.animal.id FROM RegistroMedicoORM r WHERE r.fecha BETWEEN :inicio AND :fin")
     List<Long> findDistinctAnimalIdsByFechaBetween(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    @Query("SELECT MAX(r.fecha) FROM RegistroMedicoORM r WHERE r.animal.id = :animal_id")
+    LocalDate findUltimaFechaByAnimalId(Long animal_id);
 }
