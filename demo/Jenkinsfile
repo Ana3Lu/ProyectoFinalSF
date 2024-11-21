@@ -48,14 +48,14 @@ pipeline {
                         env.JAVA_HOME = tool name: 'JDK 17'
                         sh "${env.JAVA_HOME}/bin/java -version"
                     }
-                    sh './gradlew clean build'
+                    sh './demo/gradlew clean build'
                 }
             }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
-                    sh './gradlew sonar'
+                    sh './demo/gradlew sonar'
                 }
             }
         }
