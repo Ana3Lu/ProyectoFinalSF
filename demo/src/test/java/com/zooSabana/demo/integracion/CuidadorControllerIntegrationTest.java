@@ -1,10 +1,8 @@
 package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.CuidadorDTO;
-import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.orm.CuidadorORM;
-import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

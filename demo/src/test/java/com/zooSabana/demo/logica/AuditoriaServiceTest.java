@@ -3,12 +3,9 @@ package com.zooSabana.demo.logica;
 import com.zooSabana.demo.mensajeria.logica.AuditoriaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mockito.Mockito.*;
 
 class AuditoriaServiceTest {
 

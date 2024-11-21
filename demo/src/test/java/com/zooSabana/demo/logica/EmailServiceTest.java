@@ -4,8 +4,6 @@ import com.zooSabana.demo.mensajeria.logica.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.*;
-
 class EmailServiceTest {
 
     private EmailService emailService;

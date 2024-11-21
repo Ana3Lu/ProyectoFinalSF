@@ -1,17 +1,11 @@
 package com.zooSabana.demo.controller;
 
-import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.controller.dto.EspecieDTO;
-import com.zooSabana.demo.db.orm.AnimalORM;
-import com.zooSabana.demo.db.orm.EspecieORM;
 import com.zooSabana.demo.logica.EspecieService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor

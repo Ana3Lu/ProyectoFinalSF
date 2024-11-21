@@ -1,7 +1,6 @@
 package com.zooSabana.demo.integracion;
 
 import com.zooSabana.demo.controller.dto.AnimalDTO;
-import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.db.jpa.AnimalJPA;
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;

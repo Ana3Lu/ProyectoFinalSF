@@ -1,12 +1,9 @@
 package com.zooSabana.demo.mensajeria.productores;
 
-import com.zooSabana.demo.logica.CuidadorService;
-import com.zooSabana.demo.logica.EspecieService;
 import com.zooSabana.demo.logica.RegistroMedicoService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

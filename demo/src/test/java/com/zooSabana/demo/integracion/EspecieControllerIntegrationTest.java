@@ -1,13 +1,10 @@
 package com.zooSabana.demo.integracion;
 
-import com.zooSabana.demo.controller.dto.CuidadorDTO;
 import com.zooSabana.demo.controller.dto.EspecieDTO;
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
-import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
-import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +16,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Objects;

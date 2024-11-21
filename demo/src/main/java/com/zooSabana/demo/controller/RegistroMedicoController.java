@@ -1,8 +1,6 @@
 package com.zooSabana.demo.controller;
 
-import com.zooSabana.demo.controller.dto.AnimalDTO;
 import com.zooSabana.demo.controller.dto.RegistroMedicoDTO;
-import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import com.zooSabana.demo.logica.RegistroMedicoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

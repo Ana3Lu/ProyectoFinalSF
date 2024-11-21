@@ -1,9 +1,7 @@
 package com.zooSabana.demo.logica;
 
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
-import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.CuidadorORM;
-import com.zooSabana.demo.db.orm.EspecieORM;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

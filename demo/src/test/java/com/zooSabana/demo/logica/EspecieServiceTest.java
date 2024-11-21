@@ -2,7 +2,6 @@ package com.zooSabana.demo.logica;
 
 import com.zooSabana.demo.db.jpa.CuidadorJPA;
 import com.zooSabana.demo.db.jpa.EspecieJPA;
-import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
 import org.junit.jupiter.api.Assertions;
