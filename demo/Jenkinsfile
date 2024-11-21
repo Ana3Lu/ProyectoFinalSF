@@ -44,7 +44,7 @@ pipeline {
 
         stage('Set permissions') {
             steps {
-                sh 'chmod +x gradlew'
+                sh 'chmod +x demo/gradlew'
             }
         }
 
