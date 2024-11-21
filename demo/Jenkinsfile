@@ -50,18 +50,22 @@ pipeline {
 
         stage('Build') {
             steps {
+                dir('demo') { // Navigate to the correct directory
                     script {
                         env.JAVA_HOME = tool name: 'JDK 17'
                         sh "${env.JAVA_HOME}/bin/java -version"
                     }
-                    sh './demo/gradlew clean build'
+                    sh './gradlew clean build'
                 }
             }
+        }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh './demo/gradlew sonar'
+                dir('demo') { // Continue in the correct directory
+                    withSonarQubeEnv('SonarQubeServer') {
+                        sh './gradlew sonar'
+                    }
                 }
             }
         }
