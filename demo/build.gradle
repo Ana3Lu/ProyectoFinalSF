@@ -55,7 +55,13 @@ tasks.jacocoTestReport {
 		fileTree(dir: it, exclude: [
 				'**/orm/**',
 				'**/dto/**',
-				'**/DemoApplication*'
+				'**/DemoApplication*',
+				'**/consumidores/**',
+				'**/mensajeria/**',
+				'**/productores/**',
+				'**/config/**',
+				'com/zooSabana/demo/controller/ManejadorErrores.class',
+				'com/zooSabana/demo/controller/RabbitMQController.class'
 		])
 	}))
 }

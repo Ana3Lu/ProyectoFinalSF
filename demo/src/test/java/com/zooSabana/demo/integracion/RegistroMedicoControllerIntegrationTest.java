@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.time.LocalDate;
 
@@ -193,7 +194,7 @@ public class RegistroMedicoControllerIntegrationTest {
         registro.setFecha(LocalDate.now());
         registroMedicoJPA.save(registro);
 
-        ResponseEntity<Object> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/revision-pendiente-mes", Object.class);
+        ResponseEntity<List> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/revision-pendiente-mes", List.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertNotNull(respuesta.getBody());

@@ -26,6 +26,6 @@ public class ManejadorErrores {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<String> handleGeneralException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ocurrió un error inesperado: " + ex.getMessage());
+                .body(ex.getMessage());
     }
 }

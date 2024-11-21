@@ -7,6 +7,7 @@ import com.zooSabana.demo.db.jpa.EspecieJPA;
 import com.zooSabana.demo.db.orm.AnimalORM;
 import com.zooSabana.demo.db.orm.CuidadorORM;
 import com.zooSabana.demo.db.orm.EspecieORM;
+import com.zooSabana.demo.db.orm.RegistroMedicoORM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -163,11 +164,7 @@ public class EspecieControllerIntegrationTest {
         CuidadorORM cuidador = new CuidadorORM();
         cuidador = cuidadorJPA.save(cuidador);
 
-        EspecieORM especie = new EspecieORM();
-        especie.setCuidador(cuidador);
-        especie = especieJPA.save(especie);
-
-        EspecieDTO newEspecieDTO = new EspecieDTO(1L, "Mamifero");
+        EspecieDTO newEspecieDTO = new EspecieDTO(cuidador.getId(), "Mamifero");
 
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newEspecieDTO), String.class);
@@ -178,21 +175,12 @@ public class EspecieControllerIntegrationTest {
 
     @Test
     void shouldDeleteEspecieSuccessfully() {
-        CuidadorORM cuidador = new CuidadorORM();
-        cuidador.setId(1L);
-        cuidador.setNombre("Juan Perez");
-        cuidador.setEmail("juan.perez@example.com");
-        cuidadorJPA.save(cuidador);
-
         EspecieORM nuevaEspecie = new EspecieORM();
-        nuevaEspecie.setId(1L);
-        nuevaEspecie.setNombre("Perro");
-        nuevaEspecie.setCuidador(cuidador);
         especieJPA.save(nuevaEspecie);
 
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/especies/" + nuevaEspecie.getId(), HttpMethod.DELETE, null, String.class);
 
-        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(HttpStatus.OK, respuesta.getStatusCode());
         Assertions.assertEquals("Especie eliminada exitosamente", respuesta.getBody());
     }
 
