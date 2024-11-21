@@ -191,18 +191,27 @@ public class AnimalControllerIntegrationTest {
         Assertions.assertEquals("ID de animal inválido", response.getBody());
     }
 
-    /*@Test
+    @Test
     void shouldDeleteAnimalSuccessfully() {
-        long id = 1;
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Pérez");
+        cuidador.setEmail("juan.perez@zooUser.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
+        EspecieORM especie = new EspecieORM();
+        especie.setCuidador(cuidador);
+        especie.setNombre("Perro");
+        especie = especieJPA.save(especie);
+
         AnimalORM nuevoAnimal = new AnimalORM();
-        nuevoAnimal.setId(id);
+        nuevoAnimal.setEspecie(especie);
         animalJPA.save(nuevoAnimal);
 
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/animales/" + nuevoAnimal.getId(), HttpMethod.DELETE, null, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Animal eliminado exitosamente", respuesta.getBody());
-    }*/
+    }
 
     @Test
     void shouldNotDeleteAnimalWithNonExistentId() {

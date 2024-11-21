@@ -39,9 +39,11 @@ public class RegistroMedicoController {
     }
 
     @GetMapping(path = "/registros-medicos/animales/revision-pendiente-mes")
-    public ResponseEntity<Object> getAnimalesSinRevision() {
-        return ResponseEntity.status(HttpStatus.OK).body(registroMedicoService.getAnimalesSinRevision());
+    public ResponseEntity<List<Map<String, Object>>> getAnimalesSinRevision() {
+        List<Map<String, Object>> animalesSinRevision = registroMedicoService.getAnimalesSinRevision();
+        return ResponseEntity.status(HttpStatus.OK).body(animalesSinRevision);
     }
+
 
     @PutMapping(path = "/registros-medicos/{id}")
     public ResponseEntity<String> updateRegistroMedico(@PathVariable Long id, @RequestBody RegistroMedicoDTO registroMedicoDTO) {

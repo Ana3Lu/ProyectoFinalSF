@@ -6,6 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,8 +25,14 @@ public class ManejadorErrores {
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<String> handleGeneralException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
+    protected ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+        ex.printStackTrace();
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Internal Server Error");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

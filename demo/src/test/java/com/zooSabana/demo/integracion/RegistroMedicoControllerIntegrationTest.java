@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.time.LocalDate;
 
@@ -49,6 +51,11 @@ public class RegistroMedicoControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        registroMedicoJPA.deleteAll();
+        animalJPA.deleteAll();
+        especieJPA.deleteAll();
+        cuidadorJPA.deleteAll();
+
         CuidadorORM cuidador = new CuidadorORM();
         cuidador.setNombre("Juan Perez");
         cuidador.setEmail("juan.perez@example.com");
@@ -173,6 +180,7 @@ public class RegistroMedicoControllerIntegrationTest {
 
     @Test
     void shouldGetAnimalesSinRevisionSuccessfully() {
+        // Simula los datos
         CuidadorORM cuidador = new CuidadorORM();
         cuidador.setNombre("Juan Pérez");
         cuidador.setEmail("juan.perez@zooUser.com");
@@ -191,36 +199,65 @@ public class RegistroMedicoControllerIntegrationTest {
 
         RegistroMedicoORM registro = new RegistroMedicoORM();
         registro.setAnimal(animal1);
-        registro.setFecha(LocalDate.now());
-        registroMedicoJPA.save(registro);
+        registro.setFecha(LocalDate.parse("2023-01-02"));
+        registro = registroMedicoJPA.save(registro);
 
-        ResponseEntity<List> respuesta = testRestTemplate.getForEntity("/registros-medicos/animales/revision-pendiente-mes", List.class);
+        RegistroMedicoORM registro2 = new RegistroMedicoORM();
+        registro2.setAnimal(animal1);
+        registro2.setFecha(LocalDate.parse("2023-01-01"));
+        registro2 = registroMedicoJPA.save(registro2);
 
-        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
-        Assertions.assertNotNull(respuesta.getBody());
+        ResponseEntity<List<Map<String, Object>>> respuesta = testRestTemplate.exchange(
+                "/registros-medicos/animales/revision-pendiente-mes",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+
+        Assertions.assertNotNull(respuesta, "La respuesta no debería ser nula.");
+        Assertions.assertNotNull(respuesta.getBody(), "El cuerpo de la respuesta no debería ser nulo.");
+        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful(), "El código de respuesta debería ser exitoso (2xx).");
+
+        List<Map<String, Object>> body = respuesta.getBody();
+        Assertions.assertFalse(body.isEmpty(), "El cuerpo debería contener elementos.");
+        Assertions.assertEquals(2, body.size(), "Debería haber 4 elementos en la respuesta.");
+
+        System.out.println("Respuesta JSON: " + body);
+
     }
+
 
     @Test
     void shouldUpdateRegistroMedicoSuccessfully() {
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Pérez");
+        cuidador.setEmail("juan.perez@zooUser.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
         EspecieORM especie = new EspecieORM();
+        especie.setNombre("Gato");
+        especie.setCuidador(cuidador);
         especie = especieJPA.save(especie);
 
         AnimalORM animal = new AnimalORM();
         animal.setEspecie(especie);
+        animal.setNombre("Miau");
+        animal.setEdad(2);
         animal = animalJPA.save(animal);
 
         RegistroMedicoORM registroMedico = new RegistroMedicoORM();
         registroMedico.setAnimal(animal);
-        registroMedico = registroMedicoJPA.save(registroMedico);
+        registroMedicoJPA.save(registroMedico);
 
         long id = registroMedico.getId();
 
-        RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023,8,3), "Estable", "Mixta", "Tranquilo");
+        RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(animal.getId(), LocalDate.of(2023,8,3), "Estable", "Mixta", "Tranquilo");
 
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
 
-        Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(HttpStatus.OK, respuesta.getStatusCode());
         Assertions.assertEquals("Registro médico actualizado exitosamente", respuesta.getBody());
     }
 
@@ -236,8 +273,28 @@ public class RegistroMedicoControllerIntegrationTest {
 
     @Test
     void shouldNotUpdateRegistroMedicoWithNonExistentId() {
+        CuidadorORM cuidador = new CuidadorORM();
+        cuidador.setNombre("Juan Pérez");
+        cuidador.setEmail("juan.perez@zooUser.com");
+        cuidador = cuidadorJPA.save(cuidador);
+
+        EspecieORM especie = new EspecieORM();
+        especie.setNombre("Gato");
+        especie.setCuidador(cuidador);
+        especie = especieJPA.save(especie);
+
+        AnimalORM animal = new AnimalORM();
+        animal.setEspecie(especie);
+        animal.setNombre("Miau");
+        animal.setEdad(2);
+        animal = animalJPA.save(animal);
+
+        RegistroMedicoORM registroMedico = new RegistroMedicoORM();
+        registroMedico.setAnimal(animal);
+        registroMedicoJPA.save(registroMedico);
+
         long id = 900;
-        RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(1L, LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
+        RegistroMedicoDTO newRegistroMedicoDTO = new RegistroMedicoDTO(animal.getId(), LocalDate.of(2023, 9, 26), "Enfermo", "Carnívora", "Agresivo");
         ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.PUT,
                 new HttpEntity<>(newRegistroMedicoDTO), String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
@@ -247,11 +304,12 @@ public class RegistroMedicoControllerIntegrationTest {
     @Test
     void shouldDeleteRegistroMedicoSuccessfully() {
         long id = 1;
+
         RegistroMedicoORM nuevoRegistroMedico = new RegistroMedicoORM();
         nuevoRegistroMedico.setId(id);
-        registroMedicoJPA.save(nuevoRegistroMedico);
+        nuevoRegistroMedico = registroMedicoJPA.save(nuevoRegistroMedico);
 
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + nuevoRegistroMedico.getId(), HttpMethod.DELETE, null, String.class);
 
         Assertions.assertTrue(respuesta.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Registro médico eliminado exitosamente", respuesta.getBody());
@@ -268,7 +326,10 @@ public class RegistroMedicoControllerIntegrationTest {
     @Test
     void shouldNotDeleteRegistroMedicoWithNonExistentId() {
         long id = 900;
-        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + id, HttpMethod.DELETE, null, String.class);
+        RegistroMedicoORM nuevoRegistroMedico = new RegistroMedicoORM();
+        nuevoRegistroMedico.setId(id);
+        registroMedicoJPA.save(nuevoRegistroMedico);
+        ResponseEntity<String> respuesta = testRestTemplate.exchange("/registros-medicos/" + nuevoRegistroMedico.getId(), HttpMethod.DELETE, null, String.class);
         Assertions.assertTrue(respuesta.getStatusCode().is4xxClientError());
         Assertions.assertEquals("Registro médico no encontrado", respuesta.getBody());
     }

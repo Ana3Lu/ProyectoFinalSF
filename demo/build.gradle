@@ -57,11 +57,9 @@ tasks.jacocoTestReport {
 				'**/dto/**',
 				'**/DemoApplication*',
 				'**/consumidores/**',
-				'**/mensajeria/**',
 				'**/productores/**',
 				'**/config/**',
-				'com/zooSabana/demo/controller/ManejadorErrores.class',
-				'com/zooSabana/demo/controller/RabbitMQController.class'
+				'com/zooSabana/demo/controller/ManejadorErrores.class'
 		])
 	}))
 }

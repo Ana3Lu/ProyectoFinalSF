@@ -90,6 +90,8 @@ public class RegistroMedicoService {
                 .toList();
     }
 
+
+
     public void updateRegistroMedico(Long id, Long animal_id, LocalDate fecha, String estado, String dieta, String comportamiento) {
         if (id < 0) {
             throw new IllegalArgumentException("ID de registro médico inválido");
