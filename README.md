@@ -17,4 +17,4 @@
 
 A continuación, se presenta el diagrama de paquetes de la aplicación.
 
-![Diagrama de paquetes](DiagramaPaquetes.jpg)
+![Diagrama de paquetes](DiagramaPaquetes.png)
