@@ -75,9 +75,11 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    def image = docker.build("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
-                    sh "docker image"
+                dir('demo'){
+                    script {
+                        def image = docker.build("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                        sh "docker image"
+                    }
                 }
             }
         }
