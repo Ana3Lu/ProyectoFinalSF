@@ -221,7 +221,7 @@ public class RegistroMedicoControllerIntegrationTest {
 
         List<Map<String, Object>> body = respuesta.getBody();
         Assertions.assertFalse(body.isEmpty(), "El cuerpo debería contener elementos.");
-        Assertions.assertEquals(2, body.size(), "Debería haber 4 elementos en la respuesta.");
+        Assertions.assertEquals(2, body.size(), "Debería haber 2 elementos en la respuesta.");
 
         System.out.println("Respuesta JSON: " + body);
 
