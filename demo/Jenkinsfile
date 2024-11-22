@@ -19,7 +19,7 @@ pipeline {
 
     environment {
         DOCKERHUB_REPO = 'julizzy/zoo'
-        DOCKERHUB_CREDENTIALS_ID = 'dcde267c-65cd-49a2-b04a-5b46e0ba17c9'
+        DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
     }
 
     stages {
