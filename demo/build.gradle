@@ -79,9 +79,7 @@ check.dependsOn jacocoTestCoverageVerification
 
 sonar {
 	properties {
-		property "sonar.projectKey", "Zoo"
-		property "sonar.projectName", "Zoo"
-		property "sonar.host.url", "http://localhost:9000>" // Reemplaza con tu URL
-		property "sonar.login", "< sqp_1e238235b18a69cda37a4c4771347dd929300dec>"
+		property "sonar.projectKey", "zoo"
+		property "sonar.projectName", "zoo"
 	}
 }
