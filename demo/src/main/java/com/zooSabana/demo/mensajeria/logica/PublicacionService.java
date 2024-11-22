@@ -18,7 +18,7 @@ public class PublicacionService {
         productorAuditoria.publicarAnimalesSinRevision();
     }
 
-    @Scheduled(cron = "0 */4 * * * *") // Cada 4 minutos
+    @Scheduled(cron = "0 */4 * * * *") // Cada 4 minutos para ver fácilmente su ejecución
     public void manejarPublicacionAutomatica() {
         System.out.println("Ejecutando tarea programada de publicación...");
         manejarPublicacion();
